@@ -1,11 +1,14 @@
 package com.yandex.todo.domain.model
 
+import java.time.LocalDate
+import java.util.Date
+
 data class TodoItem(
     private val id: String,
     val taskDescription: String,
     val importanceLevel: ImportanceLevel,
     val isDone: Boolean,
-    val createDate: String
+    val createDate: Date
 ) : ListItem {
     override fun getId(): String {
         return id
@@ -13,7 +16,7 @@ data class TodoItem(
 }
 
 enum class ImportanceLevel {
+    NO,
     LOW,
-    NORMAL,
-    URGENT
+    TALL,
 }

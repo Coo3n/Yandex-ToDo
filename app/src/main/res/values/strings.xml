@@ -3,7 +3,10 @@
     <string name="my_work">My Work</string>
     <string name="done">Done - </string>
     <string name="save">Save</string>
+    <string name="no">No</string>
+    <string name="low">Low</string>
+    <string name="tall">Tall</string>
     <string name="what_needs_done">What needs to be done...</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fresh">New</string>
 </resources>

@@ -5,16 +5,17 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.yandex.todo.data.local.converter.DateConvertor
 import com.yandex.todo.data.local.converter.ImportanceLevelConvertor
 import com.yandex.todo.data.local.dao.TodoDao
 import com.yandex.todo.data.local.entity.TodoItemEntity
 
 @Database(
     entities = [TodoItemEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
-@TypeConverters(ImportanceLevelConvertor::class)
+@TypeConverters(ImportanceLevelConvertor::class, DateConvertor::class)
 abstract class TodoDataBase : RoomDatabase() {
     abstract fun todoDao(): TodoDao
 

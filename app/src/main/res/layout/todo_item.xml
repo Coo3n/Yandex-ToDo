@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/todo_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="3"
-        android:textColor="@color/black"
+        android:textColor="@color/back_dark_primary"
         android:textSize="16sp"
+        android:layout_marginTop="11dp"
+        app:layout_constraintEnd_toStartOf="@+id/button_info"
+        app:layout_constraintStart_toEndOf="@id/checkbox"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Купить что-то" />
+
+    <TextView
+        android:id="@+id/todo_deadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_light_gray"
+        app:layout_constraintStart_toStartOf="@id/todo_description"
+        app:layout_constraintTop_toBottomOf="@id/todo_description"
+        tools:text="01.10.2003" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/button_info"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:backgroundTint="@color/white"
-        android:src="@drawable/icon_info" />
-</LinearLayout>
+        android:src="@drawable/icon_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

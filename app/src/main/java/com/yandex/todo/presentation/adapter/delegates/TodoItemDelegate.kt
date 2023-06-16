@@ -1,5 +1,6 @@
 package com.yandex.todo.presentation.adapter.delegates
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,14 +29,32 @@ class TodoItemDelegate : Delegate {
     }
 
     inner class TodoItemListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val isDone = itemView.findViewById<CheckBox>(R.id.checkbox)
+        private val doneCheckBox = itemView.findViewById<CheckBox>(R.id.checkbox)
         private val todoDescription = itemView.findViewById<TextView>(R.id.todo_description)
+        private val todoDeadline = itemView.findViewById<TextView>(R.id.todo_deadline)
         private val buttonInfo = itemView.findViewById<AppCompatImageButton>(R.id.button_info)
 
         fun bind(todoItem: TodoItem) {
             todoDescription.text = todoItem.taskDescription
+
             buttonInfo.setOnClickListener {
 
+            }
+
+            if (todoItem.createDate == null) {
+                todoDeadline.visibility = View.GONE
+            } else {
+                todoDeadline.text = todoItem.createDate.toString()
+            }
+
+            doneCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    todoDescription.paintFlags =
+                        todoDescription.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    todoDescription.paintFlags =
+                        todoDescription.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
             }
         }
     }

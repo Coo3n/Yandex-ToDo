@@ -1,6 +1,5 @@
 package com.yandex.todo.presentation.adapter
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter

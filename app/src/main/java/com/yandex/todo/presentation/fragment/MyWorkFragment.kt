@@ -2,24 +2,39 @@ package com.yandex.todo.presentation.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yandex.todo.MyApp
+import com.yandex.todo.R
 import com.yandex.todo.databinding.FragmentMyWorkBinding
+import com.yandex.todo.domain.model.CreateTodoItem
 import com.yandex.todo.domain.model.ImportanceLevel
 import com.yandex.todo.domain.model.TodoItem
+import com.yandex.todo.presentation.adapter.TodoItemDecoration
 import com.yandex.todo.presentation.adapter.TodoListAdapter
+import com.yandex.todo.presentation.adapter.delegates.CreateTodoItemDelegate
 import com.yandex.todo.presentation.adapter.delegates.TodoItemDelegate
 import com.yandex.todo.presentation.viewmodel.MyWorkViewModel
+import com.yandex.todo.presentation.viewmodel.TodoViewModelFactory
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class MyWorkFragment : Fragment() {
     private var _binding: FragmentMyWorkBinding? = null
     private val binding: FragmentMyWorkBinding
         get() = _binding!!
+
+    @Inject
+    lateinit var todoViewModelFactory: TodoViewModelFactory
 
     private lateinit var todoListAdapter: TodoListAdapter
     private lateinit var myWorkViewModel: MyWorkViewModel
@@ -31,7 +46,10 @@ class MyWorkFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myWorkViewModel = ViewModelProvider(this)[MyWorkViewModel::class.java]
+        myWorkViewModel = ViewModelProvider(
+            this,
+            todoViewModelFactory
+        )[MyWorkViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -45,53 +63,43 @@ class MyWorkFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initTodoList()
 
+        binding.addTodoButton.setOnClickListener {
+            findNavController().navigate(R.id.action_myWorkFragment_to_detailedWorkFragment)
+        }
+    }
+
+    private fun dpToPixel(dp: Int): Int {
+        return (dp * (resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
     }
 
     private fun initTodoList() = with(binding) {
         todoListAdapter = TodoListAdapter(
-            listDelegate = listOf(TodoItemDelegate()),
+            listDelegate = listOf(TodoItemDelegate(), CreateTodoItemDelegate()),
         )
-        todoList.layoutManager = LinearLayoutManager(requireContext())
+
+        todoList.layoutManager = LinearLayoutManager(
+            requireContext(),
+            LinearLayoutManager.VERTICAL,
+            false
+        )
+
+        TodoItemDecoration(
+            bottomMargin = dpToPixel(20),
+            topMargin = dpToPixel(25)
+        ).also {
+            todoList.addItemDecoration(it)
+        }
+
         todoList.adapter = todoListAdapter
-        todoListAdapter.submitList(
-            listOf(
-                TodoItem(
-                    id = "123",
-                    taskDescription = "Dsdsad",
-                    importanceLevel = ImportanceLevel.LOW,
-                    isDone = true,
-                    createDate = "dsad"
-                ),
-                TodoItem(
-                    id = "123",
-                    taskDescription = "Dsdsad",
-                    importanceLevel = ImportanceLevel.LOW,
-                    isDone = true,
-                    createDate = "dsad"
-                ),
-                TodoItem(
-                    id = "123",
-                    taskDescription = "Dsdsad",
-                    importanceLevel = ImportanceLevel.LOW,
-                    isDone = true,
-                    createDate = "dsad"
-                ),
-                TodoItem(
-                    id = "123",
-                    taskDescription = "Dsdsad",
-                    importanceLevel = ImportanceLevel.LOW,
-                    isDone = true,
-                    createDate = "dsad"
-                ),
-                TodoItem(
-                    id = "123",
-                    taskDescription = "Dsdsad",
-                    importanceLevel = ImportanceLevel.LOW,
-                    isDone = true,
-                    createDate = "dsad"
-                ),
-            )
-        )
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                myWorkViewModel.todoList.collect { newTodoList ->
+                    newTodoList.add(CreateTodoItem())
+                    todoListAdapter.submitList(newTodoList)
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
