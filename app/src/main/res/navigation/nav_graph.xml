@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/detailedWorkFragment">
+    <fragment
+        android:id="@+id/myWorkFragment"
+        android:name="com.yandex.todo.presentation.fragment.MyWorkFragment"
+        android:label="MyWorkFragment"
+        tools:layout="@layout/fragment_my_work" >
+        <action
+            android:id="@+id/action_myWorkFragment_to_detailedWorkFragment"
+            app:destination="@id/detailedWorkFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailedWorkFragment"
+        android:name="com.yandex.todo.presentation.fragment.DetailedWorkFragment"
+        android:label="DetailedWorkFragment"
+        tools:layout="@layout/fragment_detailed_work">
+        <action
+            android:id="@+id/action_detailedWorkFragment_to_myWorkFragment"
+            app:destination="@id/myWorkFragment" />
+    </fragment>
+</navigation>
