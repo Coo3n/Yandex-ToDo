@@ -51,7 +51,6 @@ class DetailedWorkViewModel @Inject constructor(
                             importanceLevel = _detailedWorkState.value.importanceLevel,
                             isDone = false,
                             createDate = Date()
-//                    createDate = _detailedWorkState.value.deadLine
                         )
                     )
                 }

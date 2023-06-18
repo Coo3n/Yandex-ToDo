@@ -17,15 +17,15 @@ class TodoItemsRepositoryImpl @Inject constructor(
     override suspend fun getTodoListItems(): Flow<List<ListItem>> {
         val todoList = todoDao.getTodoListItems()
 
-        val convertedList: Flow<List<ListItem>> = todoList.map { todoItemList ->
+        val convertedListItems: Flow<List<ListItem>> = todoList.map { todoItemList ->
             todoItemList.map { item -> item.toTodoItem() }
         }
 
-        val finalTodoList = convertedList.map { list ->
-            list + CreateTodoItem()
+        val finalTodoListItems = convertedListItems.map { convertedListItems ->
+            convertedListItems + CreateTodoItem()
         }
 
-        return finalTodoList
+        return finalTodoListItems
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {

@@ -3,6 +3,7 @@ package com.yandex.todo.presentation.fragment
 import android.content.Context
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,7 +29,7 @@ import com.yandex.todo.presentation.viewmodel.TodoViewModelFactory
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class MyWorkFragment : Fragment() {
+class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
     private var _binding: FragmentMyWorkBinding? = null
     private val binding: FragmentMyWorkBinding
         get() = _binding!!
@@ -64,17 +65,35 @@ class MyWorkFragment : Fragment() {
         initTodoList()
 
         binding.addTodoButton.setOnClickListener {
-            findNavController().navigate(R.id.action_myWorkFragment_to_detailedWorkFragment)
+            findNavController().navigate(
+                R.id.action_myWorkFragment_to_detailedWorkFragment
+            )
         }
     }
+
 
     private fun dpToPixel(dp: Int): Int {
         return (dp * (resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
     }
 
+    override fun onClick(position: Int) {
+        Log.i("TAG", position.toString())
+        val bundle = Bundle().apply {
+            putParcelable("TODO_ITEM", myWorkViewModel.todoList.value[position] as TodoItem)
+        }
+
+        findNavController().navigate(
+            R.id.action_myWorkFragment_to_detailedWorkFragment,
+            bundle
+        )
+    }
+
     private fun initTodoList() = with(binding) {
         todoListAdapter = TodoListAdapter(
-            listDelegate = listOf(TodoItemDelegate(), CreateTodoItemDelegate()),
+            listDelegate = listOf(
+                TodoItemDelegate(this@MyWorkFragment),
+                CreateTodoItemDelegate()
+            ),
         )
 
         todoList.layoutManager = LinearLayoutManager(

@@ -20,6 +20,7 @@ import com.yandex.todo.MyApp
 import com.yandex.todo.R
 import com.yandex.todo.databinding.FragmentDetailedWorkBinding
 import com.yandex.todo.domain.model.ImportanceLevel
+import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.presentation.event.DetailedWorkEvent
 import com.yandex.todo.presentation.viewmodel.DetailedWorkViewModel
 import com.yandex.todo.presentation.viewmodel.TodoViewModelFactory
@@ -67,6 +68,21 @@ class DetailedWorkFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
+            val todoItem = arguments?.getParcelable<TodoItem>("TODO_ITEM")
+
+            if (todoItem != null) {
+                Log.i("sdd", todoItem.toString())
+
+                importanceLevel.text = todoItem.importanceLevel.name
+                deadline.text = todoItem.createDate.toString()
+                inputTodo.setText(todoItem.taskDescription)
+
+                deleteButton.setOnClickListener {
+                    detailedWorkViewModel.onEvent(DetailedWorkEvent.RemoveData(todoItem))
+                    findNavController().navigateUp()
+                }
+            }
+
             inputTodo.textChanges().addTo(disposeBag)
 
             importanceLevel.setOnClickListener { view ->
@@ -82,12 +98,12 @@ class DetailedWorkFragment : Fragment() {
             }
 
             closeButton.setOnClickListener {
-                findNavController().popBackStack()
+                findNavController().navigateUp()
             }
 
             saveButton.setOnClickListener {
                 detailedWorkViewModel.onEvent(DetailedWorkEvent.SaveData)
-                findNavController().popBackStack()
+                findNavController().navigateUp()
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
@@ -169,6 +185,7 @@ class DetailedWorkFragment : Fragment() {
 
     private fun EditText.textChanges(): Disposable {
         return RxTextView.textChanges(this)
+            .skipInitialValue()
             .debounce(500, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.newThread())

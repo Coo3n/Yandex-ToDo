@@ -17,7 +17,10 @@ class CreateTodoItemDelegate : Delegate {
         )
     }
 
-    override fun bindViewHolder(holder: RecyclerView.ViewHolder, listItem: ListItem) {
+    override fun bindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        listItem: ListItem,
+    ) {
         (holder as CreateTodoItemViewHolder).bind(listItem as CreateTodoItem)
     }
 

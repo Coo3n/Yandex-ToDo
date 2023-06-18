@@ -5,12 +5,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.yandex.todo.domain.model.ListItem
-import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.presentation.adapter.delegates.Delegate
 
 class TodoListAdapter(
-    private val listDelegate: List<Delegate>
+    private val listDelegate: List<Delegate>,
 ) : ListAdapter<ListItem, ViewHolder>(TodoDiffUtil()) {
+
+    interface Clickable {
+        fun onClick(position: Int)
+    }
+
     class TodoDiffUtil : DiffUtil.ItemCallback<ListItem>() {
         override fun areItemsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
             return oldItem.id == newItem.id
@@ -26,7 +30,10 @@ class TodoListAdapter(
     ): ViewHolder = listDelegate[viewType].getViewHolder(parent)
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        listDelegate[getItemViewType(position)].bindViewHolder(holder, currentList[position])
+        listDelegate[getItemViewType(position)].bindViewHolder(
+            holder,
+            currentList[position],
+        )
     }
 
     override fun getItemViewType(position: Int): Int {
