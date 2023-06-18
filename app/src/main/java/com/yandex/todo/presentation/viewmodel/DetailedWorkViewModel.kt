@@ -1,11 +1,16 @@
 package com.yandex.todo.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yandex.todo.domain.model.ImportanceLevel
+import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.domain.repository.TodoItemsRepository
 import com.yandex.todo.presentation.event.DetailedWorkEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.*
 import javax.inject.Inject
 
 class DetailedWorkViewModel @Inject constructor(
@@ -38,10 +43,23 @@ class DetailedWorkViewModel @Inject constructor(
                 )
             }
             is DetailedWorkEvent.SaveData -> {
-
+                viewModelScope.launch {
+                    todoItemsRepository.addTodoItem(
+                        TodoItem(
+                            id = Random(100).toString(),
+                            taskDescription = _detailedWorkState.value.description,
+                            importanceLevel = _detailedWorkState.value.importanceLevel,
+                            isDone = false,
+                            createDate = Date()
+//                    createDate = _detailedWorkState.value.deadLine
+                        )
+                    )
+                }
             }
             is DetailedWorkEvent.RemoveData -> {
-
+                viewModelScope.launch {
+                    todoItemsRepository.deleteTodoItem(event.todoItem)
+                }
             }
         }
     }

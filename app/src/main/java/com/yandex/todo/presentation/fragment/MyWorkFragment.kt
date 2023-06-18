@@ -95,7 +95,6 @@ class MyWorkFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 myWorkViewModel.todoList.collect { newTodoList ->
-                    newTodoList.add(CreateTodoItem())
                     todoListAdapter.submitList(newTodoList)
                 }
             }

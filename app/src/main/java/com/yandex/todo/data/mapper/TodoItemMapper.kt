@@ -5,7 +5,7 @@ import com.yandex.todo.domain.model.TodoItem
 
 fun TodoItem.toTodoItemEntity(): TodoItemEntity {
     return TodoItemEntity(
-        id = getId(),
+        id = id,
         taskDescription = taskDescription,
         importanceLevel = importanceLevel,
         isDone = isDone,

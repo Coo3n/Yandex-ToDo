@@ -6,13 +6,14 @@ import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.repository.TodoItemsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MyWorkViewModel @Inject constructor(
     private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
-    private var _todoList = MutableStateFlow(mutableListOf<ListItem>())
+    private var _todoList = MutableStateFlow(listOf<ListItem>())
     val todoList = _todoList.asStateFlow()
 
     init {
@@ -21,7 +22,11 @@ class MyWorkViewModel @Inject constructor(
 
     private fun getTodoList() {
         viewModelScope.launch {
-            _todoList.value = todoItemsRepository.getTodoListItems().toMutableList()
+            todoItemsRepository.getTodoListItems()
+                .distinctUntilChanged()
+                .collect { newList ->
+                    _todoList.value = newList
+                }
         }
     }
 }

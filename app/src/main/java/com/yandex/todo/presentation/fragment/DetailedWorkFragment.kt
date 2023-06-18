@@ -69,7 +69,7 @@ class DetailedWorkFragment : Fragment() {
         with(binding) {
             inputTodo.textChanges().addTo(disposeBag)
 
-            importanceGroup.setOnClickListener { view ->
+            importanceLevel.setOnClickListener { view ->
                 initImportanceLevelMenu(view)
             }
 
@@ -82,6 +82,11 @@ class DetailedWorkFragment : Fragment() {
             }
 
             closeButton.setOnClickListener {
+                findNavController().popBackStack()
+            }
+
+            saveButton.setOnClickListener {
+                detailedWorkViewModel.onEvent(DetailedWorkEvent.SaveData)
                 findNavController().popBackStack()
             }
 

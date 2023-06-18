@@ -1,5 +1,5 @@
 package com.yandex.todo.domain.model
 
-interface ListItem {
-    fun getId(): String
+abstract class ListItem {
+    abstract val id: String
 }

@@ -6,11 +6,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.yandex.todo.data.local.entity.TodoItemEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDao {
     @Query("SELECT * FROM todos")
-    fun getTodoListItems(): List<TodoItemEntity>
+    fun getTodoListItems(): Flow<List<TodoItemEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addTodoItem(todoItem: TodoItemEntity)
