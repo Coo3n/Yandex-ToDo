@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/input_todo_style"
+        android:background="@drawable/first_todo_style"
         android:gravity="top"
         android:hint="@string/what_needs_done"
         android:minHeight="104dp"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="28dp"
-        android:text="Важность"
+        android:text="@string/important"
         android:textColor="@color/back_dark_primary"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="5dp"
-        android:text="Нет"
+        android:text="@string/no"
         android:textColor="@color/back_dark_secondary"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +89,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="32dp"
         android:text="Сделать до"
         android:textColor="@color/back_dark_primary"
         android:textSize="16sp"
@@ -127,24 +127,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deadline" />
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/delete_button"
+    <LinearLayout
+        android:id="@+id/delete_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="5dp"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="@color/back_light_primary"
-        android:src="@drawable/icon_delete"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="15dp"
+        android:foregroundGravity="center"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/second_divider_line" />
+        app:layout_constraintTop_toBottomOf="@id/second_divider_line">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Удалить"
-        android:textColor="@color/color_light_red"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/delete_button"
-        app:layout_constraintStart_toEndOf="@id/delete_button"
-        app:layout_constraintTop_toTopOf="@+id/delete_button" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/back_light_primary"
+            android:src="@drawable/icon_delete" />
+
+        <TextView
+            android:id="@+id/text_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            android:textColor="@color/color_light_red"
+            android:textSize="18sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

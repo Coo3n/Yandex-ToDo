@@ -1,5 +1,6 @@
 package com.yandex.todo.presentation.adapter.delegates
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
@@ -8,12 +9,15 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.yandex.todo.R
 import com.yandex.todo.domain.model.ImportanceLevel
 import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.presentation.adapter.TodoListAdapter
+import kotlinx.coroutines.currentCoroutineContext
+import kotlin.coroutines.coroutineContext
 
 class TodoItemDelegate(
     private val clickable: TodoListAdapter.Clickable
@@ -49,7 +53,7 @@ class TodoItemDelegate(
             }
 
             if (todoItem.importanceLevel == ImportanceLevel.TALL) {
-                doneCheckBox.setTextColor(Color.RED)
+                // TODO
             }
 
             todoDeadline.text = todoItem.createDate.toString()

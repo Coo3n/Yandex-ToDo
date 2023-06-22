@@ -2,7 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:background="@color/back_light_secondary"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp">
 
     <TextView
         android:layout_width="match_parent"

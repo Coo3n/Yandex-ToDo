@@ -11,15 +11,15 @@
         tools:layout="@layout/fragment_my_work" >
         <action
             android:id="@+id/action_myWorkFragment_to_detailedWorkFragment"
-            app:destination="@id/detailedWorkFragment" />
+            app:destination="@id/detailedWorkFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/detailedWorkFragment"
         android:name="com.yandex.todo.presentation.fragment.DetailedWorkFragment"
         android:label="DetailedWorkFragment"
-        tools:layout="@layout/fragment_detailed_work">
-        <action
-            android:id="@+id/action_detailedWorkFragment_to_myWorkFragment"
-            app:destination="@id/myWorkFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_detailed_work"/>
 </navigation>

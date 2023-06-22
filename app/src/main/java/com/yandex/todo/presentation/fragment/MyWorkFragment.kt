@@ -1,26 +1,31 @@
 package com.yandex.todo.presentation.fragment
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toolbar
+import androidx.annotation.RequiresApi
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.AppBarLayout
 import com.yandex.todo.MyApp
 import com.yandex.todo.R
 import com.yandex.todo.databinding.FragmentMyWorkBinding
-import com.yandex.todo.domain.model.CreateTodoItem
-import com.yandex.todo.domain.model.ImportanceLevel
 import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.presentation.adapter.TodoItemDecoration
+import com.yandex.todo.presentation.adapter.TodoItemTouchHelper
 import com.yandex.todo.presentation.adapter.TodoListAdapter
 import com.yandex.todo.presentation.adapter.delegates.CreateTodoItemDelegate
 import com.yandex.todo.presentation.adapter.delegates.TodoItemDelegate
@@ -43,6 +48,7 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as MyApp).appComponent.injectMyWorkFragment(this)
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +67,7 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initTodoList()
 
@@ -68,6 +75,19 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             findNavController().navigate(
                 R.id.action_myWorkFragment_to_detailedWorkFragment
             )
+        }
+
+        val collapsedToolbar = binding.colapsedToolbar
+        val closedToolbar = binding.closedToolbar
+        binding.appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
+            if (verticalOffset > -240) { // закрытый тулбар
+                collapsedToolbar.alpha = 1f
+                closedToolbar.alpha = 0f
+            } else {
+                collapsedToolbar.alpha = 0f
+                closedToolbar.alpha = 1f
+            }
+            Log.i("verticalOffset", verticalOffset.toString())
         }
     }
 
@@ -108,6 +128,10 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         ).also {
             todoList.addItemDecoration(it)
         }
+
+        val todoItemTouchHelper = ItemTouchHelper(TodoItemTouchHelper(todoListAdapter))
+        todoItemTouchHelper.attachToRecyclerView(todoList)
+
 
         todoList.adapter = todoListAdapter
 

@@ -2,12 +2,15 @@ package com.yandex.todo.presentation.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -77,7 +81,7 @@ class DetailedWorkFragment : Fragment() {
                 deadline.text = todoItem.createDate.toString()
                 inputTodo.setText(todoItem.taskDescription)
 
-                deleteButton.setOnClickListener {
+                deleteItem.setOnClickListener {
                     detailedWorkViewModel.onEvent(DetailedWorkEvent.RemoveData(todoItem))
                     findNavController().navigateUp()
                 }

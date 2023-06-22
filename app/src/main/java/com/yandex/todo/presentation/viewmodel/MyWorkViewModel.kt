@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.repository.TodoItemsRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +22,7 @@ class MyWorkViewModel @Inject constructor(
         viewModelScope.launch {
             todoItemsRepository.getTodoListItems()
                 .distinctUntilChanged()
-                .collect { newList ->
+                .collectLatest { newList ->
                     _todoList.value = newList
                 }
         }

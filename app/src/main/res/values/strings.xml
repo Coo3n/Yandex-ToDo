@@ -9,4 +9,6 @@
     <string name="what_needs_done">What needs to be done...</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fresh">New</string>
+    <string name="delete">Delete</string>
+    <string name="important">Important</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yandex.todo.R
 import com.yandex.todo.domain.model.CreateTodoItem
 import com.yandex.todo.domain.model.ListItem
+import com.yandex.todo.presentation.adapter.TodoListAdapter
 
 class CreateTodoItemDelegate : Delegate {
     override fun getViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
