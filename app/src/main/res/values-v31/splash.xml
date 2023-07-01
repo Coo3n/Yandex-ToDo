@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App.SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/color_light_red</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/animated_icon</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.Todo</item>
+    </style>
+</resources>

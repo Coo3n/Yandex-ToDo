@@ -7,9 +7,14 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.yandex.todo.R
+import com.yandex.todo.domain.repository.TodoItemsRepository
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TodoItemTouchHelper(
-    private val todoListAdapter: TodoListAdapter
+    private val todoListAdapter: TodoListAdapter,
+    private val onItemSwiped: (position: Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
     override fun onMove(
         recyclerView: RecyclerView,
@@ -19,7 +24,7 @@ class TodoItemTouchHelper(
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.adapterPosition
-
+        onItemSwiped.invoke(position)
         val currentList = todoListAdapter.currentList.toMutableList()
         currentList.removeAt(position)
         todoListAdapter.submitList(currentList)
@@ -53,7 +58,7 @@ class TodoItemTouchHelper(
                 if (dX > 0) {
                     R.color.color_light_green
                 } else {
-                    R.color.back_dark_elevated
+                    R.color.color_light_red
                 }
             )
         )

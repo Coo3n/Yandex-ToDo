@@ -8,14 +8,13 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class RoomModule {
+object RoomModule {
     @Provides
     fun provideTodoDao(todoDataBase: TodoDataBase): TodoDao {
         return todoDataBase.todoDao()
     }
 
     @Provides
-    @Singleton
     fun provideTodoDataBase(context: Context): TodoDataBase {
         return TodoDataBase.getTodoDataBaseInstance(context)
     }

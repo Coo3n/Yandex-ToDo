@@ -52,7 +52,7 @@ class TodoItemDelegate(
                 clickable.onClick(adapterPosition)
             }
 
-            if (todoItem.importanceLevel == ImportanceLevel.TALL) {
+            if (todoItem.importanceLevel == ImportanceLevel.IMPORTANT) {
                 // TODO
             }
 

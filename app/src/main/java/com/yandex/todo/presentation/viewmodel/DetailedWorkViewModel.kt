@@ -13,7 +13,7 @@ import java.time.LocalDate
 import java.util.*
 import javax.inject.Inject
 
-class DetailedWorkViewModel @Inject constructor(
+class DetailedWorkViewModel(
     private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
     private var _detailedWorkState = MutableStateFlow(DetailedState())
@@ -21,7 +21,7 @@ class DetailedWorkViewModel @Inject constructor(
 
     data class DetailedState(
         val description: String = "",
-        val importanceLevel: ImportanceLevel = ImportanceLevel.NO,
+        val importanceLevel: ImportanceLevel = ImportanceLevel.LOW,
         val deadLine: String = ""
     )
 
@@ -46,11 +46,24 @@ class DetailedWorkViewModel @Inject constructor(
                 viewModelScope.launch {
                     todoItemsRepository.addTodoItem(
                         TodoItem(
-                            id = Random(100).toString(),
+                            id = UUID.randomUUID().toString(),
                             taskDescription = _detailedWorkState.value.description,
                             importanceLevel = _detailedWorkState.value.importanceLevel,
                             isDone = false,
                             createDate = Date()
+                        )
+                    )
+                }
+            }
+            is DetailedWorkEvent.UpdateData -> {
+                viewModelScope.launch {
+                    todoItemsRepository.updateTodoItem(
+                        TodoItem(
+                            id = event.todoItem.id,
+                            taskDescription = _detailedWorkState.value.description,
+                            importanceLevel = _detailedWorkState.value.importanceLevel,
+                            isDone = event.todoItem.isDone,
+                            createDate = event.todoItem.createDate
                         )
                     )
                 }

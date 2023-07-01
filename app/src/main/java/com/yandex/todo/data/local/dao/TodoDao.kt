@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.yandex.todo.data.local.entity.TodoItemEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -14,11 +15,17 @@ interface TodoDao {
     fun getTodoListItems(): Flow<List<TodoItemEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addTodoItem(todoItem: TodoItemEntity)
+    suspend fun addTodoItem(todoItem: TodoItemEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addTodoItemList(todoItemList: List<TodoItemEntity>)
+
+    @Update
+    suspend fun updateTodoItem(todoItem: TodoItemEntity)
 
     @Delete
-    fun deleteTodoItem(todoItem: TodoItemEntity)
+    suspend fun deleteTodoItem(todoItem: TodoItemEntity)
 
     @Query("DELETE FROM todos")
-    fun clearTodos()
+    suspend fun clearTodos()
 }

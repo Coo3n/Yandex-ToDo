@@ -21,6 +21,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [YANDEX_CLIENT_ID: "0d0970774e284fa8ba9ff70b6b06479a"]
     }
 
     buildTypes {
@@ -49,6 +51,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     //Navigation
     implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
@@ -60,6 +63,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.2.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
     //Room
     def room_version = "2.4.1"
@@ -70,6 +74,21 @@ dependencies {
     //Dagger2
     implementation 'com.google.dagger:dagger:2.45'
     kapt 'com.google.dagger:dagger-compiler:2.45'
+
+    //Internet
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
+
+    //Splash layout
+    implementation "androidx.core:core-splashscreen:1.0.1"
+
+    //Auth
+    implementation "com.yandex.android:authsdk:2.5.1"
 
     //Tests
     testImplementation 'junit:junit:4.13.2'

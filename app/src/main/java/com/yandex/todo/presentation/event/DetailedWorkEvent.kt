@@ -8,5 +8,6 @@ sealed class DetailedWorkEvent {
     data class OnChangedImportanceLevel(val importanceLevel: ImportanceLevel) : DetailedWorkEvent()
     data class OnChangedDeadLine(val deadLine: String) : DetailedWorkEvent()
     object SaveData: DetailedWorkEvent()
+    data class UpdateData(val todoItem: TodoItem): DetailedWorkEvent()
     data class RemoveData(val todoItem: TodoItem): DetailedWorkEvent()
 }

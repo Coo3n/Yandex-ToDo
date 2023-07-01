@@ -15,7 +15,7 @@ data class TodoItem(
 ) : ListItem(), Parcelable
 
 enum class ImportanceLevel {
-    NO,
     LOW,
-    TALL,
+    BASIC,
+    IMPORTANT,
 }

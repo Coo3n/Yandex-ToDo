@@ -2,15 +2,12 @@ package com.yandex.todo.presentation.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -31,7 +28,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -75,16 +71,17 @@ class DetailedWorkFragment : Fragment() {
             val todoItem = arguments?.getParcelable<TodoItem>("TODO_ITEM")
 
             if (todoItem != null) {
-                Log.i("sdd", todoItem.toString())
-
+                deleteItem.visibility = View.VISIBLE
                 importanceLevel.text = todoItem.importanceLevel.name
                 deadline.text = todoItem.createDate.toString()
                 inputTodo.setText(todoItem.taskDescription)
 
                 deleteItem.setOnClickListener {
                     detailedWorkViewModel.onEvent(DetailedWorkEvent.RemoveData(todoItem))
-                    findNavController().navigateUp()
+                    findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
                 }
+            } else {
+                deleteItem.visibility = View.GONE
             }
 
             inputTodo.textChanges().addTo(disposeBag)
@@ -106,8 +103,12 @@ class DetailedWorkFragment : Fragment() {
             }
 
             saveButton.setOnClickListener {
-                detailedWorkViewModel.onEvent(DetailedWorkEvent.SaveData)
-                findNavController().navigateUp()
+                if (todoItem == null) {
+                    detailedWorkViewModel.onEvent(DetailedWorkEvent.SaveData)
+                } else {
+                    detailedWorkViewModel.onEvent(DetailedWorkEvent.UpdateData(todoItem))
+                }
+                findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
@@ -166,19 +167,19 @@ class DetailedWorkFragment : Fragment() {
             when (menuItem.itemId) {
                 R.id.importance_no -> {
                     detailedWorkViewModel.onEvent(
-                        DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.NO)
+                        DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.LOW)
                     )
                     true
                 }
                 R.id.importance_low -> {
                     detailedWorkViewModel.onEvent(
-                        DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.LOW)
+                        DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.BASIC)
                     )
                     true
                 }
                 R.id.importance_tall -> {
                     detailedWorkViewModel.onEvent(
-                        DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.TALL)
+                        DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.IMPORTANT)
                     )
                     true
                 }

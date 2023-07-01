@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/myWorkFragment">
+    app:startDestination="@id/authYandexFragment">
     <fragment
         android:id="@+id/myWorkFragment"
         android:name="com.yandex.todo.presentation.fragment.MyWorkFragment"
@@ -21,5 +21,18 @@
         android:id="@+id/detailedWorkFragment"
         android:name="com.yandex.todo.presentation.fragment.DetailedWorkFragment"
         android:label="DetailedWorkFragment"
-        tools:layout="@layout/fragment_detailed_work"/>
+        tools:layout="@layout/fragment_detailed_work">
+        <action
+            android:id="@+id/action_detailedWorkFragment_to_myWorkFragment"
+            app:destination="@id/myWorkFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/authYandexFragment"
+        android:name="com.yandex.todo.presentation.fragment.AuthYandexFragment"
+        android:label="fragment_auth_yandex"
+        tools:layout="@layout/fragment_auth_yandex" >
+        <action
+            android:id="@+id/action_authYandexFragment_to_myWorkFragment"
+            app:destination="@id/myWorkFragment" />
+    </fragment>
 </navigation>

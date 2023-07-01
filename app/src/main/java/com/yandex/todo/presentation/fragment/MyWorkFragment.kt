@@ -1,16 +1,12 @@
 package com.yandex.todo.presentation.fragment
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toolbar
-import androidx.annotation.RequiresApi
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -19,20 +15,25 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.AppBarLayout
+import androidx.work.*
 import com.yandex.todo.MyApp
 import com.yandex.todo.R
 import com.yandex.todo.databinding.FragmentMyWorkBinding
 import com.yandex.todo.domain.model.TodoItem
+import com.yandex.todo.data.remote.worker.TodoWorker
+import com.yandex.todo.data.remote.worker.TodoWorkerFactory
 import com.yandex.todo.presentation.adapter.TodoItemDecoration
 import com.yandex.todo.presentation.adapter.TodoItemTouchHelper
 import com.yandex.todo.presentation.adapter.TodoListAdapter
 import com.yandex.todo.presentation.adapter.delegates.CreateTodoItemDelegate
 import com.yandex.todo.presentation.adapter.delegates.TodoItemDelegate
+import com.yandex.todo.presentation.event.MainWorkEvent
 import com.yandex.todo.presentation.viewmodel.MyWorkViewModel
 import com.yandex.todo.presentation.viewmodel.TodoViewModelFactory
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
 
 class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
     private var _binding: FragmentMyWorkBinding? = null
@@ -42,13 +43,15 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
     @Inject
     lateinit var todoViewModelFactory: TodoViewModelFactory
 
+    @Inject
+    lateinit var todoWorkerFactory: TodoWorkerFactory
+
     private lateinit var todoListAdapter: TodoListAdapter
     private lateinit var myWorkViewModel: MyWorkViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as MyApp).appComponent.injectMyWorkFragment(this)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +60,8 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             this,
             todoViewModelFactory
         )[MyWorkViewModel::class.java]
+
+        initBackgroundTodoWorker()
     }
 
     override fun onCreateView(
@@ -67,7 +72,6 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initTodoList()
 
@@ -75,6 +79,20 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             findNavController().navigate(
                 R.id.action_myWorkFragment_to_detailedWorkFragment
             )
+        }
+
+        binding.refresher.setOnRefreshListener {
+            myWorkViewModel.onEvent(MainWorkEvent.Refresh)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    myWorkViewModel.isRefreshing.collect { isRefreshing ->
+                        if (!isRefreshing) {
+                            binding.refresher.isRefreshing = false
+                        }
+                    }
+                }
+            }
         }
 
         val collapsedToolbar = binding.colapsedToolbar
@@ -91,7 +109,6 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         }
     }
 
-
     private fun dpToPixel(dp: Int): Int {
         return (dp * (resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
     }
@@ -107,6 +124,26 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             bundle
         )
     }
+
+    private fun initBackgroundTodoWorker() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<TodoWorker>(
+            repeatInterval = 8,
+            repeatIntervalTimeUnit = TimeUnit.HOURS
+        ).setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(requireContext())
+            .enqueueUniquePeriodicWork(
+                "TodoWorker",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                periodicWorkRequest
+            )
+    }
+
 
     private fun initTodoList() = with(binding) {
         todoListAdapter = TodoListAdapter(
@@ -129,12 +166,13 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             todoList.addItemDecoration(it)
         }
 
-        val todoItemTouchHelper = ItemTouchHelper(TodoItemTouchHelper(todoListAdapter))
+        val todoItemTouchHelper = ItemTouchHelper(TodoItemTouchHelper(todoListAdapter) { position ->
+            myWorkViewModel.onEvent(MainWorkEvent.Delete(todoListAdapter.currentList[position] as TodoItem))
+        })
+
         todoItemTouchHelper.attachToRecyclerView(todoList)
 
-
         todoList.adapter = todoListAdapter
-
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 myWorkViewModel.todoList.collect { newTodoList ->

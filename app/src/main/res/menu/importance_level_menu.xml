@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/importance_no"
-        android:title="@string/no" />
-    <item
-        android:id="@+id/importance_low"
         android:title="@string/low" />
     <item
+        android:id="@+id/importance_low"
+        android:title="@string/basic" />
+    <item
         android:id="@+id/importance_tall"
-        android:title="@string/tall" />
+        android:title="@string/important" />
 </menu>

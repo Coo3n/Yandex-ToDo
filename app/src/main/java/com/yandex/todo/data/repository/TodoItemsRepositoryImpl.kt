@@ -1,9 +1,14 @@
 package com.yandex.todo.data.repository
 
 import android.util.Log
+import com.yandex.todo.data.local.AccountManager
 import com.yandex.todo.data.local.dao.TodoDao
 import com.yandex.todo.data.mapper.toTodoItem
+import com.yandex.todo.data.mapper.toTodoItemDto
 import com.yandex.todo.data.mapper.toTodoItemEntity
+import com.yandex.todo.data.mapper.toTodoItemRequest
+import com.yandex.todo.data.remote.TodoApi
+import com.yandex.todo.data.remote.dto.TodoItemListRequest
 import com.yandex.todo.domain.model.CreateTodoItem
 import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.model.TodoItem
@@ -13,45 +18,137 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TodoItemsRepositoryImpl @Inject constructor(
-    private val todoDao: TodoDao
+    private val accountManager: AccountManager,
+    private val todoDao: TodoDao,
+    private val todoApi: TodoApi
 ) : TodoItemsRepository {
-    override suspend fun getTodoListItems(): Flow<List<ListItem>> {
-        val todoList = todoDao.getTodoListItems()
-        val convertedListItems: Flow<List<ListItem>> = todoList.map { todoItemList ->
-            todoItemList.map { item -> item.toTodoItem() }
-        }
+    override suspend fun getTodoListItems(
+        fetchFromRemote: Boolean
+    ): Flow<Resource<List<ListItem>>> {
+        return flow {
+            try {
+                emit(Resource.Loading(true)) // начало загрузки
 
-        val finalTodoListItems = convertedListItems.map { convertedListItems ->
-            convertedListItems + CreateTodoItem()
-        }
-        return finalTodoListItems
+                val todoList = todoDao.getTodoListItems()
+                val convertedListItems: Flow<List<ListItem>> = todoList.map { todoItemList ->
+                    todoItemList.map { item -> item.toTodoItem() }
+                }
 
-//        return flow {
-//            val todoList = todoDao.getTodoListItems()
-//            val convertedListItems: Flow<List<ListItem>> = todoList.map { todoItemList ->
-//                todoItemList.map { item -> item.toTodoItem() }
-//            }
-//
-//            val finalTodoListItems = convertedListItems.map { convertedListItems ->
-//                convertedListItems + CreateTodoItem()
-//            }.first()
-//
-//            emit(Resource.Success(finalTodoListItems))
-//
-//
-//        }
+                val lastElementTodoList = CreateTodoItem()
+                val finalTodoListItems = convertedListItems.map { convertedListItems ->
+                    convertedListItems + lastElementTodoList
+                }.first()
+
+                emit(Resource.Success(finalTodoListItems)) // отсылаем локальные данные
+                Log.i("GET", "заэмитил данные локальные")
+
+                val shouldJustLoadOnCache = finalTodoListItems.isNotEmpty() && !fetchFromRemote
+                if (shouldJustLoadOnCache) { // берем с кэша или с сервера?
+                    emit(Resource.Loading(false))
+                    return@flow
+                }
+
+                val responseApi = todoApi.getTodoList()
+                if (responseApi.isSuccessful) {
+                    accountManager.saveRevision(responseApi.body()?.revision.toString())
+                    Log.i("GET", "revision ${responseApi.body()?.revision.toString()}")
+
+                    emit(Resource.Success(
+                        data = responseApi.body()?.listTodoItem!!.map { it.toTodoItem() } + lastElementTodoList
+                    ))
+
+                    Log.i("GET", "emit remote data")
+
+                    todoDao.clearTodos()
+                    todoDao.addTodoItemList(
+                        todoItemList = responseApi.body()?.listTodoItem!!.map { it.toTodoItemEntity() }
+                    )
+                    Log.i("GET", "clear and add")
+                } else {
+                    emit(Resource.Error("Произошла ошибка :)"))
+                }
+            } catch (exception: Exception) {
+                emit(Resource.Error(exception.message.toString()))
+            } finally {
+                emit(Resource.Loading(false))
+            }
+        }
     }
 
+    override suspend fun mergeTodoItemList() {
+        try {
+            val convertedLocalTodoList = todoDao.getTodoListItems().first().map {
+                it.toTodoItemDto()
+            }
+
+            val resultApi = todoApi.mergeTodoList(
+                TodoItemListRequest(tasks = convertedLocalTodoList)
+            )
+
+            if (resultApi.isSuccessful) {
+                accountManager.saveRevision(resultApi.body()?.revision.toString())
+            }
+        } catch (exception: Exception) {
+            Log.i("mergeTodoItemList", exception.message.toString())
+        }
+    }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
-        todoDao.addTodoItem(todoItem.toTodoItemEntity())
+        try {
+            todoDao.addTodoItem(todoItem.toTodoItemEntity())
+            val resultApi = todoApi.addTodoItem(todoItem.toTodoItemRequest())
+            if (resultApi.isSuccessful) {
+                accountManager.saveRevision(resultApi.body()?.revision.toString())
+            }
+        } catch (exception: Exception) {
+            Log.i("addTodoItem", exception.message.toString())
+        }
+    }
+
+    override suspend fun updateTodoItem(todoItem: TodoItem) {
+        try {
+            todoDao.updateTodoItem(todoItem.toTodoItemEntity())
+            val resultApi = todoApi.updateTodoItem(
+                todoItem.id,
+                todoItem.toTodoItemRequest()
+            )
+
+            if (resultApi.isSuccessful) {
+                accountManager.saveRevision(resultApi.body()?.revision.toString())
+            }
+        } catch (exception: Exception) {
+            Log.i("updateTodoItem", exception.message.toString())
+        }
+    }
+
+    override suspend fun updateTodoItemList() {
+        try {
+            val responseApi = todoApi.getTodoList()
+            if (responseApi.isSuccessful) {
+                accountManager.saveRevision(responseApi.body()?.revision.toString())
+                todoDao.clearTodos()
+                todoDao.addTodoItemList(
+                    todoItemList = responseApi.body()?.listTodoItem!!.map { it.toTodoItemEntity() }
+                )
+            }
+        } catch (exception: Exception) {
+            Log.i("updateTodoItemList", exception.message.toString())
+        }
     }
 
     override suspend fun deleteTodoItem(todoItem: TodoItem) {
-        todoDao.deleteTodoItem(todoItem.toTodoItemEntity())
+        try {
+            todoDao.deleteTodoItem(todoItem.toTodoItemEntity())
+            val resultApi = todoApi.deleteTodoItemById(todoItem.id)
+            if (resultApi.isSuccessful) {
+                accountManager.saveRevision(resultApi.body()?.revision.toString())
+            }
+        } catch (exception: Exception) {
+            Log.i("deleteTodoItem", exception.message.toString())
+        }
     }
+
 }
