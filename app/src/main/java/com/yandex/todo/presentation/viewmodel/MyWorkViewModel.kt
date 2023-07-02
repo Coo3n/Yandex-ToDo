@@ -6,6 +6,7 @@ import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.repository.TodoItemsRepository
 import com.yandex.todo.presentation.event.MainWorkEvent
 import com.yandex.todo.utils.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +30,7 @@ class MyWorkViewModel(
                 getTodoList(true)
             }
             is MainWorkEvent.Delete -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO)  {
                     todoItemsRepository.deleteTodoItem(workEvent.todoItem)
                 }
             }
@@ -37,7 +38,7 @@ class MyWorkViewModel(
     }
 
     private fun getTodoList(fetchFromRemote: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             todoItemsRepository.getTodoListItems(fetchFromRemote)
                 .distinctUntilChanged()
                 .collect { result ->

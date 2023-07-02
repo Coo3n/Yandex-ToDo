@@ -6,6 +6,7 @@ import com.yandex.todo.domain.model.ImportanceLevel
 import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.domain.repository.TodoItemsRepository
 import com.yandex.todo.presentation.event.DetailedWorkEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -43,7 +44,7 @@ class DetailedWorkViewModel(
                 )
             }
             is DetailedWorkEvent.SaveData -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     todoItemsRepository.addTodoItem(
                         TodoItem(
                             id = UUID.randomUUID().toString(),
@@ -56,7 +57,7 @@ class DetailedWorkViewModel(
                 }
             }
             is DetailedWorkEvent.UpdateData -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     todoItemsRepository.updateTodoItem(
                         TodoItem(
                             id = event.todoItem.id,
@@ -69,7 +70,7 @@ class DetailedWorkViewModel(
                 }
             }
             is DetailedWorkEvent.RemoveData -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     todoItemsRepository.deleteTodoItem(event.todoItem)
                 }
             }

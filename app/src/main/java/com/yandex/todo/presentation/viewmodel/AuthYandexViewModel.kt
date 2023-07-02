@@ -12,6 +12,7 @@ import com.yandex.authsdk.YandexAuthSdk
 import com.yandex.authsdk.YandexAuthToken
 import com.yandex.todo.domain.repository.YandexAuthRepository
 import com.yandex.todo.presentation.event.ValidationAuthEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -31,7 +32,7 @@ class AuthYandexViewModel(
     }
 
     fun handleYandexAuthResult(resultCode: Int, data: Intent?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val yandexAuthToken = authRepository.getYandexAuthToken(resultCode, data)
             _validationEventChannel.send(
                 if (yandexAuthToken != null) {

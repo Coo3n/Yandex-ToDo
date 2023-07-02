@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yandex.todo.domain.repository.TodoItemsRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,7 @@ class NetworkStatusViewModel(
     }
 
     private fun startNetworkStatusFlow() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             connectivityManager.createNetworkStatusFlow().collect { isConnected ->
                 if (isConnected && !networkStatus.value) {
                     todoItemsRepository.mergeTodoItemList()
