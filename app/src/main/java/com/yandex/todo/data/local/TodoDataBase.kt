@@ -29,9 +29,7 @@ abstract class TodoDataBase : RoomDatabase() {
                         context,
                         TodoDataBase::class.java,
                         "TodoDataBase"
-                    ).fallbackToDestructiveMigration()
-                        .allowMainThreadQueries()
-                        .build()
+                    ).fallbackToDestructiveMigration().build()
                 }
             } else {
                 todoDataBase!!

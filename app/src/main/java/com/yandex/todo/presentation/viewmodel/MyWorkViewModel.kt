@@ -30,7 +30,7 @@ class MyWorkViewModel(
                 getTodoList(true)
             }
             is MainWorkEvent.Delete -> {
-                viewModelScope.launch(Dispatchers.IO)  {
+                viewModelScope.launch(Dispatchers.IO) {
                     todoItemsRepository.deleteTodoItem(workEvent.todoItem)
                 }
             }
