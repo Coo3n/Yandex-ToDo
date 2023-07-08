@@ -25,8 +25,21 @@ class NetworkStatusViewModel(
         startNetworkStatusFlow()
     }
 
+    private fun checkInitialNetworkStatus() {
+        val capabilities = connectivityManager.getNetworkCapabilities(
+            connectivityManager.activeNetwork
+        )
+
+        if (capabilities == null) {
+            _networkStatus.value = false
+            Log.i("TAG", "Зашел startNetworkStatusFlow - initialNetworkState")
+        }
+    }
+
     private fun startNetworkStatusFlow() {
         viewModelScope.launch(Dispatchers.IO) {
+            checkInitialNetworkStatus()
+
             connectivityManager.createNetworkStatusFlow().collect { isConnected ->
                 if (isConnected && !networkStatus.value) {
                     todoItemsRepository.mergeTodoItemList()

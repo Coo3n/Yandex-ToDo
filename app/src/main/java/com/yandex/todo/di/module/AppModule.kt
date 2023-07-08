@@ -7,16 +7,12 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.yandex.todo.MyApp
+import com.yandex.todo.data.local.AccountManager
 import dagger.Module
 import dagger.Provides
 
 @Module
-class AppModule(private val application: MyApp) {
-    @Provides
-    fun provideContext(): Context {
-        return application.applicationContext
-    }
-
+object AppModule {
     @Provides
     fun provideMasterKey(context: Context): MasterKey {
         return MasterKey.Builder(context)
@@ -36,6 +32,13 @@ class AppModule(private val application: MyApp) {
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
+    }
+
+    @Provides
+    fun provideAccountManager(
+        sharedPreferences: SharedPreferences
+    ): AccountManager {
+        return AccountManager(sharedPreferences)
     }
 
     @Provides

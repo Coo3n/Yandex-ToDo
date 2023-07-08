@@ -16,7 +16,10 @@ class TodoWorkerFactory @Inject constructor(
         workerParameters: WorkerParameters
     ): ListenableWorker? {
         return when (workerClassName) {
-            TodoWorker::class.java.name -> TodoWorker(appContext, workerParameters)
+            TodoWorker::class.java.name -> TodoWorker(
+                appContext,
+                workerParameters,
+            )
             else -> null
         }
     }

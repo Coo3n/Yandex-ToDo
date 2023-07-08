@@ -84,6 +84,9 @@ dependencies {
 
     implementation "androidx.security:security-crypto:1.1.0-alpha06"
 
+    // Worker
+    implementation "androidx.work:work-runtime-ktx:2.5.0"
+
     //Splash layout
     implementation "androidx.core:core-splashscreen:1.0.1"
 

@@ -43,7 +43,6 @@ class TodoItemsRepositoryImpl @Inject constructor(
                 }.first()
 
                 emit(Resource.Success(finalTodoListItems)) // отсылаем локальные данные
-                Log.i("GET", "заэмитил данные локальные")
 
                 val shouldJustLoadOnCache = finalTodoListItems.isNotEmpty() && !fetchFromRemote
                 if (shouldJustLoadOnCache) { // берем с кэша или с сервера?
@@ -54,19 +53,15 @@ class TodoItemsRepositoryImpl @Inject constructor(
                 val responseApi = todoApi.getTodoList()
                 if (responseApi.isSuccessful) {
                     accountManager.saveRevision(responseApi.body()?.revision.toString())
-                    Log.i("GET", "revision ${responseApi.body()?.revision.toString()}")
 
                     emit(Resource.Success(
                         data = responseApi.body()?.listTodoItem!!.map { it.toTodoItem() } + lastElementTodoList
                     ))
 
-                    Log.i("GET", "emit remote data")
-
                     todoDao.clearTodos()
                     todoDao.addTodoItemList(
                         todoItemList = responseApi.body()?.listTodoItem!!.map { it.toTodoItemEntity() }
                     )
-                    Log.i("GET", "clear and add")
                 } else {
                     emit(Resource.Error("Произошла ошибка :)"))
                 }
@@ -110,6 +105,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
 
     override suspend fun updateTodoItem(todoItem: TodoItem) {
         try {
+            Log.i("updateTodoItem", "updateTodoItem")
             todoDao.updateTodoItem(todoItem.toTodoItemEntity())
             val resultApi = todoApi.updateTodoItem(
                 todoItem.id,
@@ -126,6 +122,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
 
     override suspend fun updateTodoItemList() {
         try {
+            Log.i("updateTodoItemLIST", "updateTodoItemLIST")
             val responseApi = todoApi.getTodoList()
             if (responseApi.isSuccessful) {
                 accountManager.saveRevision(responseApi.body()?.revision.toString())
@@ -150,5 +147,4 @@ class TodoItemsRepositoryImpl @Inject constructor(
             Log.i("deleteTodoItem", exception.message.toString())
         }
     }
-
 }

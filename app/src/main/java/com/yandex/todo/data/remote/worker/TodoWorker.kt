@@ -16,11 +16,15 @@ class TodoWorker(
     lateinit var todoItemsRepository: TodoItemsRepository
 
     init {
-        (context.applicationContext as MyApp).appComponent.injectWorker(this)
+        (context.applicationContext as MyApp).appComponent
+            .createTodoComponentFactory()
+            .create()
+            .injectWorker(this)
     }
 
     override suspend fun doWork(): Result {
         todoItemsRepository.updateTodoItemList()
+        Log.i("Tag", "sd")
         return Result.success()
     }
 }

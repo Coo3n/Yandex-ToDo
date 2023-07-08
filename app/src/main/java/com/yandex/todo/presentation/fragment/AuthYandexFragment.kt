@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.yandex.todo.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -35,13 +36,21 @@ class AuthYandexFragment : Fragment() {
 
     @Inject
     lateinit var authViewModelFactory: AuthViewModelFactory
-    private lateinit var authYandexViewModel: AuthYandexViewModel
+
+    private val authYandexViewModel: AuthYandexViewModel by viewModels(
+        factoryProducer = {
+            authViewModelFactory
+        }
+    )
 
     private lateinit var yandexAuthLauncher: ActivityResultLauncher<Intent>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (requireActivity().application as MyApp).appComponent.injectAuthYandexFragment(this)
+        (requireActivity().application as MyApp).appComponent
+            .createAuthComponentFactory()
+            .create()
+            .injectAuthYandexFragment(this)
     }
 
     override fun onCreateView(
@@ -54,11 +63,10 @@ class AuthYandexFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        authYandexViewModel = ViewModelProvider(
-            this,
-            authViewModelFactory
-        )[AuthYandexViewModel::class.java]
+        registerAuthResultContract()
+    }
 
+    private fun registerAuthResultContract() {
         yandexAuthLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -83,36 +91,48 @@ class AuthYandexFragment : Fragment() {
                     when (event) {
                         is ValidationAuthEvent.Success -> {
                             findNavController().navigate(R.id.action_authYandexFragment_to_myWorkFragment)
-                            Toast.makeText(
-                                requireContext(),
-                                "Добро пожаловать!",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            showToastWithText("Добро пожаловать!", Toast.LENGTH_LONG)
                         }
                         is ValidationAuthEvent.Failure -> {
-                            Snackbar.make(
-                                requireContext(),
-                                binding.root,
-                                "Попробуйте еще раз!",
-                                Snackbar.LENGTH_SHORT
-                            ).setBackgroundTint(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.white
-                                )
-                            ).setTextColor(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.label_light_primary
-                                )
-                            ).show()
-
-                            Log.e("Tag", "Походу пиздец")
+                            showSnackbarWithText("Попробуйте еще раз!", Snackbar.LENGTH_SHORT)
                         }
                     }
                 }
             }
         }
+    }
+
+
+    private fun showToastWithText(textToast: String, timeShowing: Int) {
+        Toast.makeText(
+            requireContext(),
+            textToast,
+            timeShowing
+        ).show()
+    }
+
+    private fun showSnackbarWithText(textSnackbar: String, timeShowing: Int) {
+        Snackbar.make(
+            requireContext(),
+            binding.root,
+            textSnackbar,
+            timeShowing
+        ).setCustomConstraint().show()
+    }
+
+
+    private fun Snackbar.setCustomConstraint(): Snackbar {
+        return this.setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.white
+            )
+        ).setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.label_light_primary
+            )
+        )
     }
 
     override fun onDestroy() {

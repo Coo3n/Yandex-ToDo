@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -41,20 +42,20 @@ class DetailedWorkFragment : Fragment() {
     @Inject
     lateinit var todoViewModelFactory: TodoViewModelFactory
 
+    private val detailedWorkViewModel: DetailedWorkViewModel by viewModels(
+        factoryProducer = {
+            todoViewModelFactory
+        }
+    )
+
     private val disposeBag = CompositeDisposable()
-    private lateinit var detailedWorkViewModel: DetailedWorkViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (requireActivity().application as MyApp).appComponent.injectDetailedWorkFragment(this)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        detailedWorkViewModel = ViewModelProvider(
-            this,
-            todoViewModelFactory
-        )[DetailedWorkViewModel::class.java]
+        (requireActivity().application as MyApp).appComponent
+            .createTodoComponentFactory()
+            .create()
+            .injectDetailedWorkFragment(this)
     }
 
     override fun onCreateView(
@@ -67,58 +68,80 @@ class DetailedWorkFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(binding) {
-            val todoItem = arguments?.getParcelable<TodoItem>("TODO_ITEM")
+        val todoItem = arguments?.getParcelable<TodoItem>("TODO_ITEM")
 
-            if (todoItem != null) {
-                deleteItem.visibility = View.VISIBLE
-                importanceLevel.text = todoItem.importanceLevel.name
-                deadline.text = todoItem.createDate.toString()
-                inputTodo.setText(todoItem.taskDescription)
+        binding.inputTodo.textChanges(
+            todoItem?.taskDescription.toString()
+        ).addTo(disposeBag)
 
-                deleteItem.setOnClickListener {
-                    detailedWorkViewModel.onEvent(DetailedWorkEvent.RemoveData(todoItem))
-                    findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
+        setupDeleteItem(todoItem)
+        setupImportanceLevelMenu()
+        setupSwitchButton()
+        setupCloseButton()
+        setupSaveButton(todoItem)
+        observeDetailedWorkState()
+    }
+
+    private fun observeDetailedWorkState() = with(binding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                detailedWorkViewModel.detailedWorkState.collect { newDetailedState ->
+                    importanceLevel.text = newDetailedState.importanceLevel.name
+                    deadline.text = newDetailedState.deadLine
                 }
+            }
+        }
+    }
+
+    private fun setupSaveButton(todoItem: TodoItem?) {
+        binding.saveButton.setOnClickListener {
+            val eventType = if (todoItem == null) {
+                DetailedWorkEvent.SaveData
             } else {
-                deleteItem.visibility = View.GONE
+                DetailedWorkEvent.UpdateData(todoItem)
             }
 
-            inputTodo.textChanges().addTo(disposeBag)
+            detailedWorkViewModel.onEvent(eventType)
+            findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
+        }
+    }
 
-            importanceLevel.setOnClickListener { view ->
-                initImportanceLevelMenu(view)
+    private fun setupCloseButton() {
+        binding.closeButton.setOnClickListener {
+            findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
+        }
+    }
+
+    private fun setupSwitchButton() {
+        binding.switchButton.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                showDatePicker()
+            } else {
+                resetDeadline()
             }
+        }
+    }
 
-            switchButton.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    showDatePicker()
-                } else {
-                    resetDeadline()
-                }
-            }
+    private fun setupImportanceLevelMenu() {
+        binding.importanceLevel.setOnClickListener { view ->
+            initImportanceLevelMenu(view)
+        }
+    }
 
-            closeButton.setOnClickListener {
-                findNavController().navigateUp()
-            }
+    private fun setupDeleteItem(todoItem: TodoItem?) = with(binding.deleteItem) {
+        visibility = if (todoItem != null) {
+            binding.importanceLevel.text = todoItem.importanceLevel.name
+            binding.deadline.text = todoItem.createDate.toString()
+            binding.inputTodo.setText(todoItem.taskDescription)
 
-            saveButton.setOnClickListener {
-                if (todoItem == null) {
-                    detailedWorkViewModel.onEvent(DetailedWorkEvent.SaveData)
-                } else {
-                    detailedWorkViewModel.onEvent(DetailedWorkEvent.UpdateData(todoItem))
-                }
+            setOnClickListener {
+                detailedWorkViewModel.onEvent(DetailedWorkEvent.RemoveData(todoItem))
                 findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    detailedWorkViewModel.detailedWorkState.collect { newDetailedState ->
-                        importanceLevel.text = newDetailedState.importanceLevel.name
-                        deadline.text = newDetailedState.deadLine
-                    }
-                }
-            }
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 
@@ -188,10 +211,11 @@ class DetailedWorkFragment : Fragment() {
         }
     }
 
-    private fun EditText.textChanges(): Disposable {
+    private fun EditText.textChanges(text: String): Disposable {
         return RxTextView.textChanges(this)
             .skipInitialValue()
-            .debounce(500, TimeUnit.MILLISECONDS)
+            .debounce(400, TimeUnit.MILLISECONDS)
+            .startWith(text)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.newThread())
             .subscribe({ description ->

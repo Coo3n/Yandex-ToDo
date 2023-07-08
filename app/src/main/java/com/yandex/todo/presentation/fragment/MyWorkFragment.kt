@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -42,25 +43,26 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
 
     @Inject
     lateinit var todoViewModelFactory: TodoViewModelFactory
+    private val myWorkViewModel: MyWorkViewModel by viewModels(
+        factoryProducer = {
+            todoViewModelFactory
+        }
+    )
 
     @Inject
     lateinit var todoWorkerFactory: TodoWorkerFactory
-
     private lateinit var todoListAdapter: TodoListAdapter
-    private lateinit var myWorkViewModel: MyWorkViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (requireActivity().application as MyApp).appComponent.injectMyWorkFragment(this)
+        (requireActivity().application as MyApp).appComponent
+            .createTodoComponentFactory()
+            .create()
+            .injectMyWorkFragment(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myWorkViewModel = ViewModelProvider(
-            this,
-            todoViewModelFactory
-        )[MyWorkViewModel::class.java]
-
         initBackgroundTodoWorker()
     }
 
@@ -74,13 +76,19 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initTodoList()
+        initListRefresherListener()
+        initAddButtonListener()
+    }
 
+    private fun initAddButtonListener() {
         binding.addTodoButton.setOnClickListener {
             findNavController().navigate(
                 R.id.action_myWorkFragment_to_detailedWorkFragment
             )
         }
+    }
 
+    private fun initListRefresherListener() {
         binding.refresher.setOnRefreshListener {
             myWorkViewModel.onEvent(MainWorkEvent.Refresh)
 
@@ -93,19 +101,6 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
                     }
                 }
             }
-        }
-
-        val collapsedToolbar = binding.colapsedToolbar
-        val closedToolbar = binding.closedToolbar
-        binding.appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
-            if (verticalOffset > -240) { // закрытый тулбар
-                collapsedToolbar.alpha = 1f
-                closedToolbar.alpha = 0f
-            } else {
-                collapsedToolbar.alpha = 0f
-                closedToolbar.alpha = 1f
-            }
-            Log.i("verticalOffset", verticalOffset.toString())
         }
     }
 
@@ -132,18 +127,19 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
 
         val periodicWorkRequest = PeriodicWorkRequestBuilder<TodoWorker>(
             repeatInterval = 8,
-            repeatIntervalTimeUnit = TimeUnit.HOURS
+            repeatIntervalTimeUnit = TimeUnit.HOURS,
+            flexTimeInterval = 15,
+            flexTimeIntervalUnit = TimeUnit.MINUTES
         ).setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(requireContext())
             .enqueueUniquePeriodicWork(
                 "TodoWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 periodicWorkRequest
             )
     }
-
 
     private fun initTodoList() = with(binding) {
         todoListAdapter = TodoListAdapter(

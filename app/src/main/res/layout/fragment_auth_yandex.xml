@@ -12,21 +12,21 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="50dp"
         android:src="@drawable/yandex_logo"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/sign_in_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sign_in_button"
         android:layout_width="0dp"
         android:layout_height="55dp"
         android:layout_marginHorizontal="42dp"
         android:background="@drawable/auth_button_style"
         android:hint="@string/login"
-        android:textColor="@color/label_light_primary"
+        android:stateListAnimator="@null"
+        android:textColorHint="@color/label_light_secondary"
         android:textSize="28sp"
-        app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

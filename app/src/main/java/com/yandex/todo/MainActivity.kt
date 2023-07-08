@@ -2,6 +2,7 @@ package com.yandex.todo
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.ViewModelProvider
@@ -13,20 +14,21 @@ import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var networkStatusViewModel: NetworkStatusViewModel
-
     @Inject
     lateinit var todoViewModelFactory: TodoViewModelFactory
+    private val networkStatusViewModel: NetworkStatusViewModel by viewModels(
+        factoryProducer = {
+            todoViewModelFactory
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        (application as MyApp).appComponent.injectMainActivity(this)
-
-        networkStatusViewModel = ViewModelProvider(
-            this,
-            todoViewModelFactory
-        )[NetworkStatusViewModel::class.java]
+        (application as MyApp).appComponent
+            .createTodoComponentFactory()
+            .create()
+            .injectMainActivity(this)
 
         initInternetMonitoring()
     }
