@@ -1,10 +1,11 @@
 package com.yandex.todo.data.local
 
 import android.content.SharedPreferences
+import dagger.Lazy
 import javax.inject.Inject
 
 class AccountManager @Inject constructor(
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: Lazy<SharedPreferences>
 ) {
     companion object {
         const val API_KEY = "API_KEY"
@@ -12,20 +13,22 @@ class AccountManager @Inject constructor(
     }
 
     fun saveRevision(revision: String): AccountManager {
-        sharedPreferences.edit()
+        sharedPreferences.get()
+            .edit()
             .putString(REVISION, revision)
             .apply()
         return this
     }
 
-    fun getRevision(): String? = sharedPreferences.getString(REVISION, null)
+    fun getRevision(): String? = sharedPreferences.get().getString(REVISION, null)
 
     fun saveApiKey(apiKey: String): AccountManager {
-        sharedPreferences.edit()
+        sharedPreferences.get()
+            .edit()
             .putString(API_KEY, apiKey)
             .apply()
         return this
     }
 
-    fun getApiKey(): String? = sharedPreferences.getString(API_KEY, null)
+    fun getApiKey(): String? = sharedPreferences.get().getString(API_KEY, null)
 }

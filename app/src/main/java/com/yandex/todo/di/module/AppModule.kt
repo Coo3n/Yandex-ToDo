@@ -3,11 +3,11 @@ package com.yandex.todo.di.module
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.yandex.todo.MyApp
 import com.yandex.todo.data.local.AccountManager
+import com.yandex.todo.di.qualifier.SharedPreferencesQualifier
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 
@@ -20,6 +20,7 @@ object AppModule {
             .build()
     }
 
+    @SharedPreferencesQualifier
     @Provides
     fun provideSharedPreferences(
         context: Context,
@@ -36,7 +37,7 @@ object AppModule {
 
     @Provides
     fun provideAccountManager(
-        sharedPreferences: SharedPreferences
+        @SharedPreferencesQualifier sharedPreferences: Lazy<SharedPreferences>
     ): AccountManager {
         return AccountManager(sharedPreferences)
     }

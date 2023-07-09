@@ -9,6 +9,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
+import dagger.Lazy
 
 @Module
 interface AuthModule {
@@ -16,8 +17,8 @@ interface AuthModule {
         @Provides
         @FragmentScope
         fun provideAuthViewModuleFactory(
-            authRepository: YandexAuthRepository,
-            yandexAuthSdk: YandexAuthSdk
+            authRepository: Lazy<YandexAuthRepository>,
+            yandexAuthSdk: Lazy<YandexAuthSdk>
         ): AuthViewModelFactory {
             return AuthViewModelFactory(authRepository, yandexAuthSdk)
         }
