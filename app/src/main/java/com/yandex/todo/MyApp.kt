@@ -37,15 +37,15 @@ class MyApp : Application() {
         val periodicWorkRequest = PeriodicWorkRequestBuilder<TodoWorker>(
             repeatInterval = 8,
             repeatIntervalTimeUnit = TimeUnit.HOURS,
-//            flexTimeInterval = 0,
-//            flexTimeIntervalUnit = TimeUnit.MINUTES
+            flexTimeInterval = 0,
+            flexTimeIntervalUnit = TimeUnit.MINUTES
         ).setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork(
                 "TodoWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 periodicWorkRequest
             )
     }
