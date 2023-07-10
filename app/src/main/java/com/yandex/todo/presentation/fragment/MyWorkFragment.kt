@@ -162,9 +162,11 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             todoList.addItemDecoration(it)
         }
 
-        val todoItemTouchHelper = ItemTouchHelper(TodoItemTouchHelper(todoListAdapter) { position ->
-            myWorkViewModel.onEvent(MainWorkEvent.Delete(todoListAdapter.currentList[position] as TodoItem))
-        })
+        val todoItemTouchHelper = ItemTouchHelper(
+            TodoItemTouchHelper(requireContext(), todoListAdapter) { position ->
+                myWorkViewModel.onEvent(MainWorkEvent.Delete(todoListAdapter.currentList[position] as TodoItem))
+            }
+        )
 
         todoItemTouchHelper.attachToRecyclerView(todoList)
 

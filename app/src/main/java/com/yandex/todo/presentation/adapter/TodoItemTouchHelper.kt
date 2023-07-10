@@ -1,9 +1,13 @@
 package com.yandex.todo.presentation.adapter
 
-import android.graphics.Canvas
+import android.content.Context
+import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.util.DisplayMetrics
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.yandex.todo.R
@@ -11,11 +15,33 @@ import com.yandex.todo.domain.repository.TodoItemsRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class TodoItemTouchHelper(
+    private val applicationContext: Context,
     private val todoListAdapter: TodoListAdapter,
     private val onItemSwiped: (position: Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+    private val acceptSwipePaint = Paint().apply {
+        color = applicationContext.getColor(R.color.color_light_green)
+    }
+    private val deleteSwipePaint = Paint().apply {
+        color = applicationContext.getColor(R.color.color_light_red)
+    }
+    private val whitePaint = Paint().apply {
+        colorFilter = PorterDuffColorFilter(
+            applicationContext.getColor(R.color.color_light_white),
+            PorterDuff.Mode.SRC_IN
+        )
+    }
+
+    private val acceptIcon = AppCompatResources.getDrawable(
+        applicationContext, R.drawable.icon_done
+    )!!.toBitmap()
+    private val deleteIcon = AppCompatResources.getDrawable(
+        applicationContext, R.drawable.icon_delete
+    )!!.toBitmap()
+
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
@@ -39,57 +65,54 @@ class TodoItemTouchHelper(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-
-        val backgroundCornerOffset = 20
-        val itemView = viewHolder.itemView
-
-        val icon = ContextCompat.getDrawable(
-            recyclerView.context, if (dX > 0) {
-                R.drawable.icon_done
-            } else {
-                R.drawable.icon_delete
-            }
-        )
-
-        val background = ColorDrawable(
-            ContextCompat.getColor(
-                recyclerView.context,
-                if (dX > 0) {
-                    R.color.color_light_green
-                } else {
-                    R.color.color_light_red
-                }
-            )
-        )
-
-        val iconMargin = (itemView.height - (icon?.intrinsicHeight ?: 0)) / 2
-        val iconTop = itemView.top + (itemView.height - (icon?.intrinsicHeight ?: 0)) / 2
-        val iconBottom = itemView.top + (icon?.intrinsicHeight ?: 0)
-
-        if (dX > 0) {
-            val iconLeft = itemView.left + iconMargin
-            val iconRight = itemView.left + iconMargin + (icon?.intrinsicWidth ?: 0)
-            icon?.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-            background.setBounds(
-                itemView.left, itemView.top, itemView.left +
-                        dX.toInt() + backgroundCornerOffset, itemView.bottom
-            )
-        } else if (dX < 0) {
-            val iconLeft = itemView.right - iconMargin - (icon?.intrinsicWidth ?: 0)
-            val iconRight = itemView.right - iconMargin
-            icon?.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-            background.setBounds(
-                itemView.right + dX.toInt() - backgroundCornerOffset,
-                itemView.top,
-                itemView.right,
-                itemView.bottom
-            )
-        } else {
-            background.setBounds(0, 0, 0, 0)
+        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            return
         }
 
-        background.draw(c)
-        icon?.draw(c)
+        val itemView = viewHolder.itemView
+
+        val isSwipeRight = dX > 0
+
+        val swipeRect = if (isSwipeRight) {
+            RectF(
+                itemView.left.toFloat(),
+                itemView.top.toFloat(),
+                itemView.left.toFloat() + dX + convertDpToPx(8),
+                itemView.bottom.toFloat()
+            )
+        } else if (dX.toInt() == 0) {
+            RectF(
+                itemView.left.toFloat(),
+                itemView.top.toFloat(),
+                itemView.left.toFloat(),
+                itemView.bottom.toFloat()
+            )
+        } else {
+            RectF(
+                itemView.right.toFloat() + dX - convertDpToPx(8),
+                itemView.top.toFloat(),
+                itemView.right.toFloat(),
+                itemView.bottom.toFloat()
+            )
+        }
+
+        val iconX = if (isSwipeRight) {
+            itemView.left.toFloat() - convertDpToPx(40) + dX
+        } else {
+            itemView.right.toFloat() + convertDpToPx(40) - deleteIcon.width + dX
+        }
+
+        val iconY =
+            itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - acceptIcon.height) / 2
+
+        c.drawRect(swipeRect, if (isSwipeRight) acceptSwipePaint else deleteSwipePaint)
+        c.drawBitmap(if (isSwipeRight) acceptIcon else deleteIcon, iconX, iconY, whitePaint)
+
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+    }
+
+    private fun convertDpToPx(dp: Int): Int {
+        return (dp * (applicationContext.resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
     }
 }
