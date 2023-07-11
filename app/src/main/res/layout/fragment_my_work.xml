@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/back_light_primary"
+    android:background="?back_primary"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -14,10 +14,11 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/back_light_primary"
+            android:background="?back_primary"
             android:elevation="20dp"
             app:expandedTitleMarginBottom="50dp"
             app:expandedTitleMarginStart="58dp"
+            app:collapsedTitleTextColor="?label_primary"
             app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
             app:title="@string/my_work">
 
@@ -55,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
                 android:button="@drawable/icon_visibility"
-                android:buttonTint="@color/black"
+                android:buttonTint="?color_blue"
                 android:checked="false" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -81,7 +82,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="35dp"
-        android:backgroundTint="@color/color_light_blue"
+        android:backgroundTint="?color_blue"
         android:contentDescription="TODO"
         app:srcCompat="@drawable/icon_add" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

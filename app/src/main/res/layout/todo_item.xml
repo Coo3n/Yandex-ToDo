@@ -21,7 +21,7 @@
         android:layout_marginTop="11dp"
         android:ellipsize="end"
         android:maxLines="3"
-        android:textColor="@color/back_dark_primary"
+        android:textColor="?label_primary"
         android:textSize="16sp"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@+id/button_info"
@@ -33,7 +33,7 @@
         android:id="@+id/todo_deadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/color_light_gray"
+        android:textColor="?label_secondary"
         app:layout_constraintStart_toStartOf="@id/todo_description"
         app:layout_constraintTop_toBottomOf="@id/todo_description"
         tools:text="01.10.2003" />
@@ -42,9 +42,9 @@
         android:id="@+id/button_info"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@color/white"
+        android:background="@android:color/transparent"
         android:src="@drawable/icon_info"
-        android:tint="@android:color/tertiary_text_light"
+        android:tint="?color_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

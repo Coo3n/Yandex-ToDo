@@ -33,6 +33,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
                 emit(Resource.Loading(true)) // начало загрузки
 
                 val todoList = todoDao.getTodoListItems()
+
                 val convertedListItems: Flow<List<ListItem>> = todoList.map { todoItemList ->
                     todoItemList.map { item -> item.toTodoItem() }
                 }

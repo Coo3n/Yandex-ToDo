@@ -213,8 +213,7 @@ class DetailedWorkFragment : Fragment() {
 
     private fun EditText.textChanges(text: String): Disposable {
         return RxTextView.textChanges(this)
-            .skipInitialValue()
-            .debounce(400, TimeUnit.MILLISECONDS)
+            .debounce(200, TimeUnit.MILLISECONDS)
             .startWith(text)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.newThread())

@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/back_light_primary">
+    android:background="?back_primary">
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/close_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/back_light_primary"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="?back_primary"
         android:src="@drawable/icon_close"
+        android:tint="?label_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +24,7 @@
         android:gravity="center"
         android:text="@string/save"
         android:textAllCaps="true"
-        android:textColor="@color/color_light_blue"
+        android:textColor="?color_blue"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/close_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +44,7 @@
         android:minHeight="104dp"
         android:paddingHorizontal="10dp"
         android:paddingTop="10dp"
-        android:textColor="@color/back_dark_primary"
+        android:textColor="?label_primary"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,7 +57,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="28dp"
         android:text="@string/important"
-        android:textColor="@color/back_dark_primary"
+        android:textColor="?label_primary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +70,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="5dp"
         android:text="@string/low"
-        android:textColor="@color/back_dark_secondary"
+        android:textColor="?label_secondary"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/importance_text" />
@@ -92,7 +93,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="32dp"
         android:text="Сделать до"
-        android:textColor="@color/back_dark_primary"
+        android:textColor="?label_primary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="5dp"
-        android:textColor="@color/color_light_blue"
+        android:textColor="?color_blue"
         android:textSize="14sp"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@+id/switch_button"
@@ -125,7 +126,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
-        android:background="@color/color_light_gray_light"
+        android:background="?color_gray_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deadline" />
@@ -147,7 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:backgroundTint="@color/back_light_primary"
+            android:backgroundTint="?back_primary"
             android:src="@drawable/icon_delete" />
 
         <TextView
@@ -155,7 +156,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/delete"
-            android:textColor="@color/color_light_red"
+            android:textColor="?color_red"
             android:textSize="18sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

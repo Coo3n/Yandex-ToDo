@@ -15,7 +15,8 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/detailedWorkFragment"
@@ -24,7 +25,8 @@
         tools:layout="@layout/fragment_detailed_work">
         <action
             android:id="@+id/action_detailedWorkFragment_to_myWorkFragment"
-            app:destination="@id/myWorkFragment" />
+            app:destination="@id/myWorkFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/authYandexFragment"
@@ -33,6 +35,8 @@
         tools:layout="@layout/fragment_auth_yandex" >
         <action
             android:id="@+id/action_authYandexFragment_to_myWorkFragment"
-            app:destination="@id/myWorkFragment" />
+            app:destination="@id/myWorkFragment"
+            app:popUpTo="@id/authYandexFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>
