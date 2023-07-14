@@ -1,6 +1,7 @@
 package com.yandex.todo.data.repository
 
 import android.util.Log
+import androidx.work.impl.background.systemalarm.SystemAlarmScheduler
 import com.yandex.todo.data.local.AccountManager
 import com.yandex.todo.data.local.dao.TodoDao
 import com.yandex.todo.data.mapper.toTodoItem
@@ -9,6 +10,7 @@ import com.yandex.todo.data.mapper.toTodoItemEntity
 import com.yandex.todo.data.mapper.toTodoItemRequest
 import com.yandex.todo.data.remote.TodoApi
 import com.yandex.todo.data.remote.dto.TodoItemListRequest
+import com.yandex.todo.data.remote.notification.TodoAlarmManager
 import com.yandex.todo.domain.model.CreateTodoItem
 import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.model.TodoItem
@@ -22,6 +24,7 @@ import javax.inject.Inject
 
 class TodoItemsRepositoryImpl @Inject constructor(
     private val accountManager: AccountManager,
+    private val todoScheduler: TodoAlarmManager,
     private val todoDao: TodoDao,
     private val todoApi: TodoApi
 ) : TodoItemsRepository {
@@ -76,9 +79,9 @@ class TodoItemsRepositoryImpl @Inject constructor(
 
     override suspend fun mergeTodoItemList() {
         try {
-            val convertedLocalTodoList = todoDao.getTodoListItems().first().map {
-                it.toTodoItemDto()
-            }
+            val convertedLocalTodoList = todoDao.getTodoListItems()
+                .first()
+                .map { it.toTodoItemDto() }
 
             val resultApi = todoApi.mergeTodoList(
                 TodoItemListRequest(tasks = convertedLocalTodoList)
@@ -95,6 +98,11 @@ class TodoItemsRepositoryImpl @Inject constructor(
     override suspend fun addTodoItem(todoItem: TodoItem) {
         try {
             todoDao.addTodoItem(todoItem.toTodoItemEntity())
+
+            if (todoItem.deadline != null) {
+                todoScheduler.schedule(todoItem)
+            }
+
             val resultApi = todoApi.addTodoItem(todoItem.toTodoItemRequest())
             if (resultApi.isSuccessful) {
                 accountManager.saveRevision(resultApi.body()?.revision.toString())
@@ -108,6 +116,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
         try {
             Log.i("updateTodoItem", "updateTodoItem")
             todoDao.updateTodoItem(todoItem.toTodoItemEntity())
+            todoScheduler.schedule(todoItem)
             val resultApi = todoApi.updateTodoItem(
                 todoItem.id,
                 todoItem.toTodoItemRequest()
@@ -116,6 +125,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
             if (resultApi.isSuccessful) {
                 accountManager.saveRevision(resultApi.body()?.revision.toString())
             }
+
         } catch (exception: Exception) {
             Log.i("updateTodoItem", exception.message.toString())
         }
@@ -127,10 +137,19 @@ class TodoItemsRepositoryImpl @Inject constructor(
             val responseApi = todoApi.getTodoList()
             if (responseApi.isSuccessful) {
                 accountManager.saveRevision(responseApi.body()?.revision.toString())
+
+                val listTodoItems = responseApi.body()?.listTodoItem!!
+
                 todoDao.clearTodos()
                 todoDao.addTodoItemList(
-                    todoItemList = responseApi.body()?.listTodoItem!!.map { it.toTodoItemEntity() }
+                    todoItemList = listTodoItems.map { it.toTodoItemEntity() }
                 )
+
+                listTodoItems.forEach { itemDto ->
+                    if (itemDto.deadline != null) {
+                        todoScheduler.schedule(itemDto.toTodoItem())
+                    }
+                }
             }
         } catch (exception: Exception) {
             Log.i("updateTodoItemList", exception.message.toString())
@@ -140,6 +159,11 @@ class TodoItemsRepositoryImpl @Inject constructor(
     override suspend fun deleteTodoItem(todoItem: TodoItem) {
         try {
             todoDao.deleteTodoItem(todoItem.toTodoItemEntity())
+
+            if (todoItem.deadline != null) {
+                todoScheduler.cancel(todoItem)
+            }
+
             val resultApi = todoApi.deleteTodoItemById(todoItem.id)
             if (resultApi.isSuccessful) {
                 accountManager.saveRevision(resultApi.body()?.revision.toString())

@@ -11,5 +11,6 @@ data class TodoItemEntity(
     val taskDescription: String,
     val importanceLevel: ImportanceLevel,
     val isDone: Boolean,
-    val createDate: Date
+    val createDate: Date,
+    val deadline: Date?,
 )

@@ -3,40 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/authYandexFragment">
+    app:startDestination="@id/myWorkFragment">
     <fragment
         android:id="@+id/myWorkFragment"
         android:name="com.yandex.todo.presentation.fragment.MyWorkFragment"
         android:label="MyWorkFragment"
-        tools:layout="@layout/fragment_my_work" >
+        tools:layout="@layout/fragment_my_work">
         <action
-            android:id="@+id/action_myWorkFragment_to_detailedWorkFragment"
-            app:destination="@id/detailedWorkFragment"
+            android:id="@+id/action_myWorkFragment_to_detailWorkFragment"
+            app:destination="@id/detailWorkFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"
-            app:popUpToInclusive="false" />
-    </fragment>
-    <fragment
-        android:id="@+id/detailedWorkFragment"
-        android:name="com.yandex.todo.presentation.fragment.DetailedWorkFragment"
-        android:label="DetailedWorkFragment"
-        tools:layout="@layout/fragment_detailed_work">
+            app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_detailedWorkFragment_to_myWorkFragment"
-            app:destination="@id/myWorkFragment"
-            app:popUpToInclusive="false" />
+            android:id="@+id/action_myWorkFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/authYandexFragment"
         android:name="com.yandex.todo.presentation.fragment.AuthYandexFragment"
         android:label="fragment_auth_yandex"
-        tools:layout="@layout/fragment_auth_yandex" >
+        tools:layout="@layout/fragment_auth_yandex">
         <action
             android:id="@+id/action_authYandexFragment_to_myWorkFragment"
             app:destination="@id/myWorkFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/authYandexFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <fragment
+        android:id="@+id/detailWorkFragment"
+        android:name="com.yandex.todo.presentation.fragment.DetailWorkFragment"
+        android:label="fragment_detail_work"
+        tools:layout="@layout/fragment_detail_work">
+        <action
+            android:id="@+id/action_detailWorkFragment_to_myWorkFragment"
+            app:destination="@id/myWorkFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.yandex.todo.presentation.fragment.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

@@ -13,7 +13,8 @@ fun TodoItem.toTodoItemEntity(): TodoItemEntity {
         taskDescription = taskDescription,
         importanceLevel = importanceLevel,
         isDone = isDone,
-        createDate = createDate
+        createDate = createDate,
+        deadline = deadline
     )
 }
 
@@ -26,7 +27,8 @@ fun TodoItem.toTodoItemRequest(): TodoItemRequest {
             isDone = isDone,
             createDate = createDate.time,
             changedDate = Date().time,
-            lastUpdatedDeviceId = "1"
+            lastUpdatedDeviceId = "1",
+            deadline = deadline?.time
         )
     )
 }
@@ -39,7 +41,8 @@ fun TodoItemEntity.toTodoItemDto(): TodoItemDto {
         isDone = isDone,
         createDate = createDate.time,
         changedDate = Date().time,
-        lastUpdatedDeviceId = "1"
+        lastUpdatedDeviceId = "1",
+        deadline = deadline?.time
     )
 }
 
@@ -49,7 +52,8 @@ fun TodoItemEntity.toTodoItem(): TodoItem {
         taskDescription = taskDescription,
         importanceLevel = importanceLevel,
         isDone = isDone,
-        createDate = createDate
+        createDate = createDate,
+        deadline = deadline
     )
 }
 
@@ -60,7 +64,8 @@ fun TodoItemDto.toTodoItem(): TodoItem {
         taskDescription = text.toString(),
         importanceLevel = enumValueOf(importanceLevel.toString().uppercase()),
         isDone = isDone == true,
-        createDate = Date(createDate!!)
+        createDate = Date(createDate!!),
+        deadline = deadline?.let { Date(it) }
     )
 }
 
@@ -70,7 +75,8 @@ fun TodoItemDto.toTodoItemEntity(): TodoItemEntity {
         taskDescription = text.toString(),
         importanceLevel = enumValueOf(importanceLevel.toString().uppercase()),
         isDone = isDone == true,
-        createDate = Date(createDate!!)
+        createDate = Date(createDate!!),
+        deadline = deadline?.let { Date(it) }
     )
 }
 

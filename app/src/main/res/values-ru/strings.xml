@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Планерник</string>
+    <string name="my_work">Мои дела</string>
+    <string name="done">Выполнено - </string>
+    <string name="save">Сохранить</string>
+    <string name="important">Высокий</string>
+    <string name="basic">Низкий</string>
+    <string name="low">Нет</string>
+    <string name="make_up_to">Сделать до</string>
+    <string name="what_needs_done">Что надо сделать...</string>
+    <string name="always_bright">Всегда светлая</string>
+    <string name="always_night">Всегда темная</string>
+    <string name="as_the_system">Как в системе</string>
+    <string name="settings">Настройки</string>
+    <string name="hello_blank_fragment">приветик</string>
+    <string name="fresh">Добавить</string>
+    <string name="delete">Удалить</string>
+    <string name="login">Войти</string>
+    <string name="exit">Обратно</string>
+</resources>

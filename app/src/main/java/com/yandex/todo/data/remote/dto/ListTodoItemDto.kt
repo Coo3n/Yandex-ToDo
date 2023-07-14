@@ -25,6 +25,8 @@ data class TodoItemDto(
     val color: String? = null,
     @SerializedName("created_at")
     val createDate: Long?,
+    @SerializedName("deadline")
+    val deadline: Long?,
     @SerializedName("changed_at")
     val changedDate: Long?,
     @SerializedName("last_updated_by")

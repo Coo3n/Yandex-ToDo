@@ -16,9 +16,9 @@
             android:layout_height="match_parent"
             android:background="?back_primary"
             android:elevation="20dp"
+            app:collapsedTitleTextColor="?label_primary"
             app:expandedTitleMarginBottom="50dp"
             app:expandedTitleMarginStart="58dp"
-            app:collapsedTitleTextColor="?label_primary"
             app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
             app:title="@string/my_work">
 
@@ -50,10 +50,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <ImageButton
+                android:id="@+id/settings"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="50dp"
+                android:backgroundTint="?back_primary"
+                android:src="@drawable/icon_settings"
+                app:tint="?label_secondary" />
+
             <CheckBox
                 android:id="@+id/visibility_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="bottom|end"
                 android:button="@drawable/icon_visibility"
                 android:buttonTint="?color_blue"

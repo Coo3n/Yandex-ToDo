@@ -12,7 +12,7 @@ import com.yandex.todo.data.local.entity.TodoItemEntity
 
 @Database(
     entities = [TodoItemEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(ImportanceLevelConvertor::class, DateConvertor::class)

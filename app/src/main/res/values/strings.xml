@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Todo</string>
     <string name="my_work">My Work</string>
@@ -5,10 +6,16 @@
     <string name="save">Save</string>
     <string name="basic">Basic</string>
     <string name="low">Low</string>
+    <string name="make_up_to">Make up to</string>
     <string name="what_needs_done">What needs to be done...</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fresh">New</string>
+    <string name="settings">Settings</string>
+    <string name="always_bright">Always bright</string>
+    <string name="always_night">Always night</string>
+    <string name="as_the_system">As in the system</string>
     <string name="delete">Delete</string>
     <string name="important">Important</string>
     <string name="login">Login</string>
+    <string name="exit">Exit</string>
 </resources>

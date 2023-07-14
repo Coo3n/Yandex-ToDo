@@ -1,20 +1,20 @@
 package com.yandex.todo
 
 import android.app.Application
-import android.util.Log
-import androidx.work.*
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.yandex.todo.data.local.ThemeManager
 import com.yandex.todo.data.remote.worker.TodoWorker
-import com.yandex.todo.data.remote.worker.TodoWorkerFactory
 import com.yandex.todo.di.component.AppComponent
 import com.yandex.todo.di.component.DaggerAppComponent
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class MyApp : Application() {
     lateinit var appComponent: AppComponent
-
-    @Inject
-    lateinit var todoWorkerFactory: TodoWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -22,11 +22,14 @@ class MyApp : Application() {
             .factory()
             .create(this)
 
-        appComponent.createAuthComponentFactory()
-            .create()
-            .injectMyApp(this)
-
+        setApplicationTheme()
         initBackgroundTodoWorker()
+    }
+
+    private fun setApplicationTheme() {
+        AppCompatDelegate.setDefaultNightMode(
+            ThemeManager(this).getTheme()
+        )
     }
 
     private fun initBackgroundTodoWorker() {

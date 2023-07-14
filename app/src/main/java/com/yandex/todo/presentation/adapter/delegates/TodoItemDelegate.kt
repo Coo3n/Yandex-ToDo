@@ -17,6 +17,9 @@ import com.yandex.todo.domain.model.ListItem
 import com.yandex.todo.domain.model.TodoItem
 import com.yandex.todo.presentation.adapter.TodoListAdapter
 import kotlinx.coroutines.currentCoroutineContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.coroutineContext
 
 class TodoItemDelegate(
@@ -56,7 +59,7 @@ class TodoItemDelegate(
                 // TODO
             }
 
-            todoDeadline.text = todoItem.createDate.toString()
+            todoDeadline.text = getStringFromDate(todoItem.deadline)
 
             doneCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -68,5 +71,14 @@ class TodoItemDelegate(
                 }
             }
         }
+    }
+
+    private fun getStringFromDate(date: Date?): String? {
+        if (date == null) {
+            return ""
+        }
+
+        val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return format.format(date)
     }
 }

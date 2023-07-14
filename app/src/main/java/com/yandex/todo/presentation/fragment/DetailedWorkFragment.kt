@@ -102,13 +102,13 @@ class DetailedWorkFragment : Fragment() {
             }
 
             detailedWorkViewModel.onEvent(eventType)
-            findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
+            //findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
         }
     }
 
     private fun setupCloseButton() {
         binding.closeButton.setOnClickListener {
-            findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
+            //findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
         }
     }
 
@@ -136,7 +136,7 @@ class DetailedWorkFragment : Fragment() {
 
             setOnClickListener {
                 detailedWorkViewModel.onEvent(DetailedWorkEvent.RemoveData(todoItem))
-                findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
+                //findNavController().navigate(R.id.action_detailedWorkFragment_to_myWorkFragment)
             }
 
             View.VISIBLE
@@ -194,18 +194,21 @@ class DetailedWorkFragment : Fragment() {
                     )
                     true
                 }
+
                 R.id.importance_low -> {
                     detailedWorkViewModel.onEvent(
                         DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.BASIC)
                     )
                     true
                 }
+
                 R.id.importance_tall -> {
                     detailedWorkViewModel.onEvent(
                         DetailedWorkEvent.OnChangedImportanceLevel(ImportanceLevel.IMPORTANT)
                     )
                     true
                 }
+
                 else -> false
             }
         }

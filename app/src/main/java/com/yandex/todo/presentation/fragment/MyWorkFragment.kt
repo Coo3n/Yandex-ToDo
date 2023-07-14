@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -70,6 +71,7 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
         _binding = FragmentMyWorkBinding.inflate(inflater)
         return binding.root
     }
@@ -78,12 +80,22 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         initTodoList()
         initListRefresherListener()
         initAddButtonListener()
+        initSettingsButton()
+
+    }
+
+    private fun initSettingsButton() {
+        binding.settings.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_myWorkFragment_to_settingsFragment
+            )
+        }
     }
 
     private fun initAddButtonListener() {
         binding.addTodoButton.setOnClickListener {
             findNavController().navigate(
-                R.id.action_myWorkFragment_to_detailedWorkFragment
+                R.id.action_myWorkFragment_to_detailWorkFragment
             )
         }
     }
@@ -115,7 +127,7 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         }
 
         findNavController().navigate(
-            R.id.action_myWorkFragment_to_detailedWorkFragment,
+            R.id.action_myWorkFragment_to_detailWorkFragment,
             bundle
         )
     }
