@@ -28,7 +28,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val taskDescription = intent?.getStringExtra(TodoAlarmManager.TASK_DESCRIPTION) ?: "exist"
         val importanceLevel = intent?.getStringExtra(TodoAlarmManager.IMPORTANCE_LEVEL) ?: "exist"
 
-        if (taskDescription == "exist" && importanceLevel == "exist") {
+        if (taskDescription != "exist" && importanceLevel != "exist") {
             Log.i("NOTIFICATION", "todoItem AlarmReceiver")
             notificationManager.get().createNotification(taskDescription, importanceLevel)
         }

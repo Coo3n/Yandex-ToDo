@@ -390,18 +390,21 @@ private fun ChoiceDateTask(
                 )
 
                 Text(
-                    text = detailedState.deadLine,
+                    text = detailedState.deadLine.toString(),
                     color = Blue,
                     style = ExtendedTheme.typography.subhead
                 )
             }
         })
 
-        var checkedState by rememberSaveable { mutableStateOf<Boolean>(false) }
+        var checkedState by rememberSaveable {
+            mutableStateOf(detailedState.deadLine?.isNotEmpty())
+        }
+
         val context = LocalContext.current
 
         Switch(
-            checked = checkedState,
+            checked = checkedState == true,
             onCheckedChange = { newState ->
                 if (newState) {
                     showDataPicker(context, onEvent)

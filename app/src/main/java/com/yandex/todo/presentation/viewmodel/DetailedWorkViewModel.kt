@@ -24,7 +24,7 @@ class DetailedWorkViewModel(
     data class DetailedState(
         val description: String = "",
         val importanceLevel: ImportanceLevel = ImportanceLevel.LOW,
-        val deadLine: String = ""
+        val deadLine: String? = ""
     )
 
     fun onEvent(event: DetailedWorkEvent) {
@@ -51,6 +51,7 @@ class DetailedWorkViewModel(
                 _detailedWorkState.value = _detailedWorkState.value.copy(
                     description = event.todoItem.taskDescription,
                     importanceLevel = event.todoItem.importanceLevel,
+                    deadLine = getStringFromDate(event.todoItem.deadline)
                 )
             }
 
@@ -92,8 +93,17 @@ class DetailedWorkViewModel(
         }
     }
 
-    private fun getDateFromString(date: String): Date? {
-        if (date.isEmpty()) {
+    private fun getStringFromDate(date: Date?): String? {
+        if (date == null) {
+            return null
+        }
+
+        val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return format.format(date)
+    }
+
+    private fun getDateFromString(date: String?): Date? {
+        if (date == "") {
             return null
         }
 

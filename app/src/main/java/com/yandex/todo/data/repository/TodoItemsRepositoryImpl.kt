@@ -116,7 +116,11 @@ class TodoItemsRepositoryImpl @Inject constructor(
         try {
             Log.i("updateTodoItem", "updateTodoItem")
             todoDao.updateTodoItem(todoItem.toTodoItemEntity())
-            todoScheduler.schedule(todoItem)
+
+            if (todoItem.deadline != null) {
+                todoScheduler.schedule(todoItem)
+            }
+
             val resultApi = todoApi.updateTodoItem(
                 todoItem.id,
                 todoItem.toTodoItemRequest()
