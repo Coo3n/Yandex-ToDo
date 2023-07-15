@@ -116,7 +116,7 @@ class DetailWorkFragment : Fragment() {
 
             val state = detailedWorkViewModel.detailedWorkState.collectAsState()
 
-            DetailedWorkScene(
+            DetailedLightWorkScene(
                 todoItem = todoItem,
                 state = state,
                 onNavigateUp = {
@@ -130,7 +130,7 @@ class DetailWorkFragment : Fragment() {
 
 @Composable
 @Preview(showBackground = true)
-fun DetailedWorkScene(
+fun DetailedLightWorkScene(
     todoItem: TodoItem? = null,
     state: State<DetailedWorkViewModel.DetailedState> = remember {
         mutableStateOf(
@@ -190,9 +190,60 @@ fun DetailedWorkScene(
 
 
 @Composable
+@Preview(showBackground = true)
+fun DetailedDarkWorkScene(
+    todoItem: TodoItem? = null,
+    state: State<DetailedWorkViewModel.DetailedState> = remember {
+        mutableStateOf(
+            DetailedWorkViewModel.DetailedState()
+        )
+    },
+    onNavigateUp: () -> Unit = {},
+    onEvent: (DetailedWorkEvent) -> Unit = {},
+) {
+    TodoAppTheme(darkTheme = true) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+            containerColor = ExtendedTheme.colors.backPrimary,
+            topBar = {
+                TodoTaskTopBar( //Тулбар
+                    onNavigateUp = { },
+                    onAction = {}
+                )
+            },
+            content = { padding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = padding.calculateTopPadding()),
+                ) {
+                    item {
+                        InputFieldTask() // Поле ввода
+                        ChoiceImportantTask() // Выбор приоритета
+                        Divider(
+                            color = GrayLight,
+                            thickness = 1.dp,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        ChoiceDateTask() // Выбор времени
+                        Divider(
+                            color = GrayLight,
+                            thickness = 1.dp,
+                        )
+                        DeleteTask() // Удаление таски
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
 private fun TodoTaskTopBar(
-    onNavigateUp: () -> Unit,
-    onAction: () -> Unit
+    onNavigateUp: () -> Unit = {},
+    onAction: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -238,8 +289,8 @@ private fun TodoTaskTopBar(
 
 @Composable
 private fun InputFieldTask(
-    inputText: DetailedWorkViewModel.DetailedState,
-    onEvent: (DetailedWorkEvent) -> Unit
+    inputText: DetailedWorkViewModel.DetailedState = DetailedWorkViewModel.DetailedState(),
+    onEvent: (DetailedWorkEvent) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -281,8 +332,8 @@ private fun InputFieldTask(
 
 @Composable
 private fun ChoiceImportantTask(
-    detailedState: DetailedWorkViewModel.DetailedState,
-    onEvent: (DetailedWorkEvent) -> Unit
+    detailedState: DetailedWorkViewModel.DetailedState = DetailedWorkViewModel.DetailedState(),
+    onEvent: (DetailedWorkEvent) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -371,8 +422,8 @@ private fun getImportanceLevelToString(
 
 @Composable
 private fun ChoiceDateTask(
-    detailedState: DetailedWorkViewModel.DetailedState,
-    onEvent: (DetailedWorkEvent) -> Unit
+    detailedState: DetailedWorkViewModel.DetailedState = DetailedWorkViewModel.DetailedState(),
+    onEvent: (DetailedWorkEvent) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -429,7 +480,7 @@ private fun ChoiceDateTask(
 
 private fun showDataPicker(
     context: Context,
-    onEvent: (DetailedWorkEvent) -> Unit
+    onEvent: (DetailedWorkEvent) -> Unit = {}
 ) {
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val year = calendar.get(Calendar.YEAR)
@@ -446,9 +497,9 @@ private fun showDataPicker(
 
 @Composable
 private fun DeleteTask(
-    todoItem: TodoItem?,
-    onNavigateUp: () -> Unit,
-    onEvent: (DetailedWorkEvent) -> Unit,
+    todoItem: TodoItem? = null,
+    onNavigateUp: () -> Unit = {},
+    onEvent: (DetailedWorkEvent) -> Unit = {},
 ) {
     val backgroundColor = if (todoItem != null) Red else GrayLight
 
