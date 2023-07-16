@@ -2,11 +2,14 @@ package com.yandex.todo.presentation.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.*
+import com.google.android.material.snackbar.Snackbar
 import com.yandex.todo.MyApp
 import com.yandex.todo.R
 import com.yandex.todo.databinding.FragmentMyWorkBinding
@@ -81,7 +85,6 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
         initListRefresherListener()
         initAddButtonListener()
         initSettingsButton()
-
     }
 
     private fun initSettingsButton() {
@@ -176,7 +179,7 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
 
         val todoItemTouchHelper = ItemTouchHelper(
             TodoItemTouchHelper(requireContext(), todoListAdapter) { position ->
-                myWorkViewModel.onEvent(MainWorkEvent.Delete(todoListAdapter.currentList[position] as TodoItem))
+                showCancelSnackBar(todoListAdapter.currentList[position] as TodoItem)
             }
         )
 
@@ -190,6 +193,37 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
                 }
             }
         }
+    }
+
+    private fun showCancelSnackBar(todoItem: TodoItem) {
+        val snackbar = Snackbar.make(
+            requireView(),
+            todoItem.taskDescription,
+            Snackbar.LENGTH_INDEFINITE
+        )
+
+        myWorkViewModel.onEvent(MainWorkEvent.TimingDelete(todoItem))
+
+        snackbar.setAction("Отменить") {
+            myWorkViewModel.onEvent(MainWorkEvent.TimingRestore(todoItem))
+            snackbar.dismiss()
+        }
+
+        val countDownTimer = object : CountDownTimer(5000, 1000) {
+            override fun onTick(tick: Long) {
+                snackbar.setText("Дело: ${todoItem.taskDescription}, удаление через: ${tick / 1000}")
+            }
+
+            override fun onFinish() {
+                if (snackbar.isShown) {
+                    myWorkViewModel.onEvent(MainWorkEvent.Delete(todoItem))
+                    snackbar.dismiss()
+                }
+            }
+        }
+
+        snackbar.show()
+        countDownTimer.start()
     }
 
     override fun onDestroy() {
