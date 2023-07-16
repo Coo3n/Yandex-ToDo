@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
@@ -221,6 +222,8 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
                 }
             }
         }
+
+        snackbar.view.animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom)
 
         snackbar.show()
         countDownTimer.start()
