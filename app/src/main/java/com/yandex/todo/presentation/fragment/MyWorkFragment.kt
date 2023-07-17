@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -37,6 +38,7 @@ import com.yandex.todo.presentation.adapter.delegates.TodoItemDelegate
 import com.yandex.todo.presentation.event.MainWorkEvent
 import com.yandex.todo.presentation.viewmodel.MyWorkViewModel
 import com.yandex.todo.presentation.viewmodel.TodoViewModelFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -97,10 +99,25 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
     }
 
     private fun initAddButtonListener() {
-        binding.addTodoButton.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_myWorkFragment_to_detailWorkFragment
+        binding.addTodoButton.setOnClickListener { button ->
+            val scaleAnimation = AnimationUtils.loadAnimation(
+                requireContext(),
+                R.anim.button_scale
             )
+
+            scaleAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    findNavController().navigate(
+                        R.id.action_myWorkFragment_to_detailWorkFragment
+                    )
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+
+            button.startAnimation(scaleAnimation)
         }
     }
 
@@ -223,7 +240,10 @@ class MyWorkFragment : Fragment(), TodoListAdapter.Clickable {
             }
         }
 
-        snackbar.view.animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom)
+
+        snackbar.view.startAnimation(
+            AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom)
+        )
 
         snackbar.show()
         countDownTimer.start()
