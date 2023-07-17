@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
+import kotlin.math.abs
 
 @AppScope
 class TodoAlarmManager @Inject constructor(
@@ -34,9 +35,9 @@ class TodoAlarmManager @Inject constructor(
     }
 
     private fun exactAlarmTask(todoItem: TodoItem) {
-        alarmManager.setExactAndAllowWhileIdle(
+        alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
-            getSchedulerTimeFromDeadline(),
+            getSchedulerTimeFromDeadline(todoItem.deadline!!),
             getPendingIntentWithConstraint(todoItem)
         )
     }
@@ -55,13 +56,35 @@ class TodoAlarmManager @Inject constructor(
         )
     }
 
-    private fun getSchedulerTimeFromDeadline(): Long {
-        val calendar = Calendar.getInstance().apply {
+    private fun getSchedulerTimeFromDeadline(deadlineDate: Date): Long {
+        val currentDate = Calendar.getInstance().apply {
             time = Date()
-            add(Calendar.HOUR_OF_DAY, 12)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
 
-        return calendar.timeInMillis
+        val deadlineCalendar = Calendar.getInstance().apply {
+            time = deadlineDate
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        // Определяем разницу в миллисекундах между текущей датой и датой дедлайна
+        val differenceInMillis = abs(deadlineCalendar.timeInMillis - currentDate.timeInMillis)
+
+        // Количество миллисекунд в одном дне
+        val millisecondsInDay = 24 * 60 * 60 * 1000
+
+        // Вычисляем количество дней, округляя в меньшую сторону
+        val daysUntilDeadline = differenceInMillis / millisecondsInDay
+
+        currentDate.time = Date()
+        currentDate.add(Calendar.DAY_OF_YEAR, daysUntilDeadline.toInt())
+        return currentDate.timeInMillis
     }
 
     companion object {

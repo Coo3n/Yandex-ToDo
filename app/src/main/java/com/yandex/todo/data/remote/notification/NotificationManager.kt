@@ -6,10 +6,13 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
+import com.yandex.todo.MainActivity
 import com.yandex.todo.R
 import com.yandex.todo.di.scope.AppScope
 import javax.inject.Inject
@@ -31,11 +34,18 @@ class NotificationManager @Inject constructor(
             contentNotification = "Empty task"
         }
 
+        val pendingIntent = NavDeepLinkBuilder(applicationContext)
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.myWorkFragment)
+            .createPendingIntent()
+
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.icon_add)
             .setContentTitle(contentNotification)
             .setContentText("Important: $importanceLevel")
             .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
         val notificationManager = NotificationManagerCompat.from(applicationContext)

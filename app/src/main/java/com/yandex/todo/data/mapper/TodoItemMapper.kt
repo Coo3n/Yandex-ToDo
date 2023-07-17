@@ -1,9 +1,8 @@
 package com.yandex.todo.data.mapper
 
 import com.yandex.todo.data.local.entity.TodoItemEntity
-import com.yandex.todo.data.remote.dto.TodoItemDto
-import com.yandex.todo.data.remote.dto.TodoItemListRequest
-import com.yandex.todo.data.remote.dto.TodoItemRequest
+import com.yandex.todo.data.remote.dto.request.TodoItemDto
+import com.yandex.todo.data.remote.dto.request.TodoItemRequest
 import com.yandex.todo.domain.model.TodoItem
 import java.util.*
 

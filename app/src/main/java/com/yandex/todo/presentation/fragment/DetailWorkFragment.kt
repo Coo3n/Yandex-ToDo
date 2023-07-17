@@ -2,6 +2,8 @@ package com.yandex.todo.presentation.fragment
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +47,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -103,34 +104,32 @@ class DetailWorkFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_detail_work, container, false)
-    }
+        return ComposeView(context = requireContext()).apply {
+            setContent {
+                val todoItem = arguments?.getParcelable<TodoItem>("TODO_ITEM")
+                if (todoItem != null) {
+                    detailedWorkViewModel.onEvent(DetailedWorkEvent.SetData(todoItem))
+                }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+                val state = detailedWorkViewModel.detailedWorkState.collectAsState()
 
-        view.findViewById<ComposeView>(R.id.compose_detailed_fragment).setContent {
-            val todoItem = arguments?.getParcelable<TodoItem>("TODO_ITEM")
-            if (todoItem != null) {
-                detailedWorkViewModel.onEvent(DetailedWorkEvent.SetData(todoItem))
+                DetailedWorkScene(
+                    todoItem = todoItem,
+                    state = state,
+                    onNavigateUp = {
+                        findNavController().navigate(R.id.action_detailWorkFragment_to_myWorkFragment)
+                    },
+                    onEvent = { event -> detailedWorkViewModel.onEvent(event) },
+                )
             }
-
-            val state = detailedWorkViewModel.detailedWorkState.collectAsState()
-
-            DetailedLightWorkScene(
-                todoItem = todoItem,
-                state = state,
-                onNavigateUp = {
-                    findNavController().navigate(R.id.action_detailWorkFragment_to_myWorkFragment)
-                },
-                onEvent = { event -> detailedWorkViewModel.onEvent(event) },
-            )
         }
     }
 }
 
 @Composable
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview(showBackground = true)
-fun DetailedLightWorkScene(
+fun DetailedWorkScene(
     todoItem: TodoItem? = null,
     state: State<DetailedWorkViewModel.DetailedState> = remember {
         mutableStateOf(
@@ -188,62 +187,10 @@ fun DetailedLightWorkScene(
     }
 }
 
-
-@Composable
-@Preview(showBackground = true)
-fun DetailedDarkWorkScene(
-    todoItem: TodoItem? = null,
-    state: State<DetailedWorkViewModel.DetailedState> = remember {
-        mutableStateOf(
-            DetailedWorkViewModel.DetailedState()
-        )
-    },
-    onNavigateUp: () -> Unit = {},
-    onEvent: (DetailedWorkEvent) -> Unit = {},
-) {
-    TodoAppTheme(darkTheme = true) {
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding(),
-            containerColor = ExtendedTheme.colors.backPrimary,
-            topBar = {
-                TodoTaskTopBar( //Тулбар
-                    onNavigateUp = { },
-                    onAction = {}
-                )
-            },
-            content = { padding ->
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = padding.calculateTopPadding()),
-                ) {
-                    item {
-                        InputFieldTask() // Поле ввода
-                        ChoiceImportantTask() // Выбор приоритета
-                        Divider(
-                            color = GrayLight,
-                            thickness = 1.dp,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                        ChoiceDateTask() // Выбор времени
-                        Divider(
-                            color = GrayLight,
-                            thickness = 1.dp,
-                        )
-                        DeleteTask() // Удаление таски
-                    }
-                }
-            }
-        )
-    }
-}
-
 @Composable
 private fun TodoTaskTopBar(
-    onNavigateUp: () -> Unit = {},
-    onAction: () -> Unit = {}
+    onNavigateUp: () -> Unit,
+    onAction: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -289,8 +236,8 @@ private fun TodoTaskTopBar(
 
 @Composable
 private fun InputFieldTask(
-    inputText: DetailedWorkViewModel.DetailedState = DetailedWorkViewModel.DetailedState(),
-    onEvent: (DetailedWorkEvent) -> Unit = {}
+    inputText: DetailedWorkViewModel.DetailedState,
+    onEvent: (DetailedWorkEvent) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -332,16 +279,19 @@ private fun InputFieldTask(
 
 @Composable
 private fun ChoiceImportantTask(
-    detailedState: DetailedWorkViewModel.DetailedState = DetailedWorkViewModel.DetailedState(),
-    onEvent: (DetailedWorkEvent) -> Unit = {}
+    detailedState: DetailedWorkViewModel.DetailedState,
+    onEvent: (DetailedWorkEvent) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val items = listOf(
-        stringResource(id = R.string.low),
-        stringResource(id = R.string.basic),
-        "!! ${stringResource(id = R.string.important)}"
-    )
+    val context = LocalContext.current
+    val items = remember {
+        listOf(
+            context.getString(R.string.low),
+            context.getString(R.string.basic),
+            "!! ${context.getString(R.string.important)}"
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -422,8 +372,8 @@ private fun getImportanceLevelToString(
 
 @Composable
 private fun ChoiceDateTask(
-    detailedState: DetailedWorkViewModel.DetailedState = DetailedWorkViewModel.DetailedState(),
-    onEvent: (DetailedWorkEvent) -> Unit = {}
+    detailedState: DetailedWorkViewModel.DetailedState,
+    onEvent: (DetailedWorkEvent) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -482,7 +432,7 @@ private fun ChoiceDateTask(
 
 private fun showDataPicker(
     context: Context,
-    onEvent: (DetailedWorkEvent) -> Unit = {}
+    onEvent: (DetailedWorkEvent) -> Unit
 ) {
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val year = calendar.get(Calendar.YEAR)
@@ -500,10 +450,12 @@ private fun showDataPicker(
 @Composable
 private fun DeleteTask(
     todoItem: TodoItem? = null,
-    onNavigateUp: () -> Unit = {},
-    onEvent: (DetailedWorkEvent) -> Unit = {},
+    onNavigateUp: () -> Unit,
+    onEvent: (DetailedWorkEvent) -> Unit,
 ) {
-    val backgroundColor = if (todoItem != null) Red else GrayLight
+    val backgroundColor = remember {
+        if (todoItem != null) Red else GrayLight
+    }
 
     Box(
         modifier = Modifier
@@ -537,4 +489,11 @@ private fun DeleteTask(
             )
         }
     }
+}
+
+@Composable
+@Preview(uiMode = UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(uiMode = UI_MODE_NIGHT_NO, showBackground = true)
+private fun TodoPalette() {
+
 }

@@ -1,7 +1,6 @@
 package com.yandex.todo.data.repository
 
 import android.util.Log
-import androidx.work.impl.background.systemalarm.SystemAlarmScheduler
 import com.yandex.todo.data.local.AccountManager
 import com.yandex.todo.data.local.dao.TodoDao
 import com.yandex.todo.data.mapper.toTodoItem
@@ -9,7 +8,7 @@ import com.yandex.todo.data.mapper.toTodoItemDto
 import com.yandex.todo.data.mapper.toTodoItemEntity
 import com.yandex.todo.data.mapper.toTodoItemRequest
 import com.yandex.todo.data.remote.TodoApi
-import com.yandex.todo.data.remote.dto.TodoItemListRequest
+import com.yandex.todo.data.remote.dto.request.TodoItemListRequest
 import com.yandex.todo.data.remote.notification.TodoAlarmManager
 import com.yandex.todo.domain.model.CreateTodoItem
 import com.yandex.todo.domain.model.ListItem

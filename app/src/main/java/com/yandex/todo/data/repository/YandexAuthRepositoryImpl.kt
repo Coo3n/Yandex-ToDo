@@ -21,6 +21,8 @@ class YandexAuthRepositoryImpl @Inject constructor(
             if (yandexAuthToken != null) {
                 accountManager.get().saveApiKey(yandexAuthToken.value)
             }
+
+            //YandexAuthToken{token='y0_AgAAAAAnaWb9AARC0QAAAADmknuXEBOUK9cmSieyFdwW5LC9DVmi-0I', expiresIn=29919654}
             return yandexAuthToken
         } catch (e: YandexAuthException) {
             null

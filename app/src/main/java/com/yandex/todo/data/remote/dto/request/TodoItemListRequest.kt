@@ -1,4 +1,4 @@
-package com.yandex.todo.data.remote.dto
+package com.yandex.todo.data.remote.dto.request
 
 import com.google.gson.annotations.SerializedName
 

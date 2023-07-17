@@ -1,6 +1,11 @@
 package com.yandex.todo.data.remote
 
 import com.yandex.todo.data.remote.dto.*
+import com.yandex.todo.data.remote.dto.request.ListTodoItemDto
+import com.yandex.todo.data.remote.dto.request.TodoItemListRequest
+import com.yandex.todo.data.remote.dto.request.TodoItemRequest
+import com.yandex.todo.data.remote.dto.response.TodoItemListResponse
+import com.yandex.todo.data.remote.dto.response.TodoItemResponse
 import retrofit2.Response
 import retrofit2.http.*
 
