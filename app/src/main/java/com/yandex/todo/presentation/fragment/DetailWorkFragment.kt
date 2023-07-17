@@ -440,11 +440,13 @@ private fun ChoiceDateTask(
                     style = ExtendedTheme.typography.body
                 )
 
-                Text(
-                    text = detailedState.deadLine.toString(),
-                    color = Blue,
-                    style = ExtendedTheme.typography.subhead
-                )
+                detailedState.deadLine?.let {
+                    Text(
+                        text = it,
+                        color = Blue,
+                        style = ExtendedTheme.typography.subhead
+                    )
+                }
             }
         })
 
